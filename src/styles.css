@@ -1,0 +1,269 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --font-sans: "Geist Variable", "Inter", sans-serif;
+  --font-display: "Source Serif 4", Georgia, serif;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.375rem;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand-cyan: var(--brand-cyan);
+  --color-brand-teal: var(--brand-teal);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-panel: var(--panel);
+  --color-overlay: var(--overlay);
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-premium: var(--premium);
+  --color-premium-foreground: var(--premium-foreground);
+  --color-premium-muted: var(--premium-muted);
+  --color-positive: var(--positive);
+  --color-warning: var(--warning);
+  --color-notification: var(--notification);
+  --color-avatar: var(--avatar);
+  --color-avatar-foreground: var(--avatar-foreground);
+  --color-status-active: var(--status-active);
+  --color-status-active-foreground: var(--status-active-foreground);
+  --color-status-paused: var(--status-paused);
+  --color-status-paused-foreground: var(--status-paused-foreground);
+  --shadow-workspace: var(--shadow-workspace);
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: oklch(0.985 0.003 80);
+  --foreground: oklch(0.18 0.012 70);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.012 70);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.129 0.042 264.695);
+  --primary: oklch(0.32 0.08 184);
+  --primary-foreground: oklch(0.99 0.002 80);
+  --secondary: oklch(0.955 0.006 80);
+  --secondary-foreground: oklch(0.22 0.015 70);
+  --muted: oklch(0.96 0.004 80);
+  --muted-foreground: oklch(0.32 0.012 70);
+  --accent: oklch(0.925 0.014 175);
+  --accent-foreground: oklch(0.24 0.06 184);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(0.9 0.006 80);
+  --input: oklch(0.9 0.006 80);
+  --ring: oklch(0.48 0.085 184);
+  --brand-cyan: oklch(0.884 0.150 199.5);
+  --brand-teal: oklch(0.366 0.061 199.7);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.975 0.004 80);
+  --sidebar-foreground: oklch(0.22 0.012 70);
+  --sidebar-primary: oklch(0.32 0.08 184);
+  --sidebar-primary-foreground: oklch(0.99 0.002 80);
+  --sidebar-accent: oklch(0.94 0.008 80);
+  --sidebar-accent-foreground: oklch(0.22 0.012 70);
+  --sidebar-border: oklch(0.9 0.006 80);
+  --sidebar-ring: oklch(0.48 0.085 184);
+  --panel: oklch(0.97 0.004 80);
+  --overlay: oklch(0.15 0.01 70 / 45%);
+  --ink: oklch(0.23 0.018 70);
+  --ink-foreground: oklch(0.98 0.003 80);
+  --premium: oklch(0.24 0.045 184);
+  --premium-foreground: oklch(0.98 0.005 175);
+  --premium-muted: oklch(0.78 0.025 175);
+  --positive: oklch(0.48 0.11 156);
+  --warning: oklch(0.59 0.14 55);
+  --notification: oklch(0.61 0.22 28);
+  --avatar: oklch(0.88 0.035 55);
+  --avatar-foreground: oklch(0.28 0.035 55);
+  --status-active: oklch(0.93 0.04 156);
+  --status-active-foreground: oklch(0.38 0.1 156);
+  --status-paused: oklch(0.93 0.05 75);
+  --status-paused-foreground: oklch(0.45 0.11 55);
+  --shadow-workspace: 0 12px 32px oklch(0.2 0.01 70 / 8%);
+}
+
+.dark {
+  --background: oklch(0.16 0.012 190);
+  --foreground: oklch(0.94 0.006 175);
+  --card: oklch(0.205 0.013 190);
+  --card-foreground: oklch(0.94 0.006 175);
+  --popover: oklch(0.225 0.014 190);
+  --popover-foreground: oklch(0.94 0.006 175);
+  --primary: oklch(0.7 0.1 175);
+  --primary-foreground: oklch(0.15 0.018 190);
+  --secondary: oklch(0.24 0.014 190);
+  --secondary-foreground: oklch(0.92 0.006 175);
+  --muted: oklch(0.23 0.012 190);
+  --muted-foreground: oklch(0.85 0.012 180);
+  --accent: oklch(0.29 0.035 178);
+  --accent-foreground: oklch(0.94 0.008 175);
+  --destructive: oklch(0.65 0.19 25);
+  --destructive-foreground: oklch(0.98 0.004 25);
+  --border: oklch(0.36 0.015 190 / 65%);
+  --input: oklch(0.38 0.016 190 / 75%);
+  --ring: oklch(0.67 0.09 175);
+  --brand-cyan: oklch(0.884 0.150 199.5);
+  --brand-teal: oklch(0.366 0.061 199.7);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.185 0.014 190);
+  --sidebar-foreground: oklch(0.92 0.007 175);
+  --sidebar-primary: oklch(0.7 0.1 175);
+  --sidebar-primary-foreground: oklch(0.15 0.018 190);
+  --sidebar-accent: oklch(0.255 0.018 185);
+  --sidebar-accent-foreground: oklch(0.94 0.006 175);
+  --sidebar-border: oklch(0.34 0.016 190 / 60%);
+  --sidebar-ring: oklch(0.67 0.09 175);
+  --panel: oklch(0.185 0.012 190);
+  --overlay: oklch(0.06 0.008 190 / 65%);
+  --ink: oklch(0.88 0.015 175);
+  --ink-foreground: oklch(0.16 0.012 190);
+  --premium: oklch(0.28 0.055 180);
+  --premium-foreground: oklch(0.94 0.01 175);
+  --premium-muted: oklch(0.73 0.035 175);
+  --positive: oklch(0.67 0.12 156);
+  --warning: oklch(0.73 0.14 70);
+  --notification: oklch(0.67 0.2 28);
+  --avatar: oklch(0.38 0.055 55);
+  --avatar-foreground: oklch(0.94 0.015 65);
+  --status-active: oklch(0.3 0.065 156);
+  --status-active-foreground: oklch(0.82 0.1 156);
+  --status-paused: oklch(0.32 0.06 70);
+  --status-paused-foreground: oklch(0.84 0.11 75);
+  --shadow-workspace: 0 12px 32px oklch(0.04 0.01 190 / 28%);
+}
+
+/*
+ * Alfie brand gradient (logo: #00F6FF to #03484B).
+ * Reserved for Alfie surfaces only: Alfie's mark and avatar, the composer,
+ * Alfie panels and AI-generated content markers. Never for general UI chrome,
+ * navigation, or non-Alfie actions, which stay on the neutral tokens above.
+ */
+@utility alfie-gradient {
+  background-image: linear-gradient(120deg, var(--brand-cyan), var(--brand-teal));
+}
+
+@utility alfie-surface {
+  background-image: linear-gradient(150deg, oklch(0.44 0.075 199.7), var(--brand-teal) 55%, oklch(0.29 0.05 199.7));
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    margin: 0;
+    letter-spacing: 0;
+    text-rendering: optimizeLegibility;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Headings name documents and files, so they use the serif display face.
+     Interface chrome, tables, and controls stay in Geist. */
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  button, input, textarea { font: inherit; }
+
+  /* Table headers name columns; they never wrap onto a second line.
+     Body cells may wrap, headers stay on one line in every module. */
+  th {
+    white-space: nowrap;
+  }
+}
+
+/*
+ * Native selects draw their own dropdown arrow, which lands wherever the
+ * browser puts it and crowds the label. Every select in the app uses this
+ * utility instead: the native arrow is removed and a chevron is drawn at a
+ * fixed inset, with right padding reserved so text never runs under it.
+ */
+@utility select-chevron {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233f3d38' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.55rem center;
+  background-size: 0.9rem 0.9rem;
+  padding-right: 1.8rem;
+}
+
+.dark .select-chevron {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23d6d6d0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}

@@ -1,0 +1,97 @@
+# AGENTS.md
+
+Working notes for anyone building on this project.
+
+## History
+
+This project is the Enterprise Finance (CFO office) product in the Alfie
+Platform family, the second vertical after Insurance. It was created on
+2026-11-17 from the Alfie Insurance Intelligence codebase, which remains
+the reference implementation for the shared UI, and the build runs on the
+plain Vite config in `vite.config.ts`. Work happens directly on the `main`
+branch. `BUILD_BRIEF.md` holds the sample company, people and canonical
+figures for this product; keep figures consistent with it.
+
+## Architecture
+
+- TanStack Start (React 19) with file-based routing. Every module is one
+  route file in `src/routes/` (for example `accounting.tsx`, `close.tsx`,
+  `reports.tsx`), so a module can be built or changed without touching the
+  others.
+- Module sample data and domain types live in `src/lib/`, one file per
+  module (`accounting-data.ts`, `workspace-data.ts`, `admin-data.ts`,
+  `reports-data.ts`, plus the payables, receivables, close, treasury,
+  planning and agents data). Keep figures consistent across modules: reuse the
+  existing data files instead of inventing parallel numbers.
+- Shared UI lives in `src/components/`: `app-shell.tsx` is the sidebar and
+  header shell every route renders inside, `alfie-composer.tsx` is the shared
+  chat input, and small per-module components (navs, badges) sit beside the
+  routes they serve. Building blocks from shadcn/Radix are in
+  `src/components/ui/`.
+- Style only through the semantic color tokens in `src/styles.css`
+  (background, card, primary, muted-foreground, and so on) so light and dark
+  modes stay synchronized on every route. Workspace theme state lives in the
+  shared app shell.
+- `src/server.ts` is the SSR entry and error wrapper; `src/lib/error-capture.ts`
+  and `src/lib/error-page.ts` support it. Client errors from the root
+  boundary go through `src/lib/error-reporting.ts`.
+
+## Design system
+
+- The reference implementation for this design system is the Alfie
+  Insurance Intelligence repo; shared patterns should stay in step with it.
+- Brand gradient: the Alfie logo gradient (#00F6FF to #03484B, tokens
+  `--brand-cyan` / `--brand-teal` in `src/styles.css`) appears ONLY where
+  Alfie is present: Alfie's mark and avatar (`AlfieMark`), the composer,
+  Alfie panels, and markers on AI-generated content (`AlfieChip`). General
+  UI chrome, navigation, and non-Alfie actions stay on the neutral black,
+  white, and grey tokens. The customer's own identity (sidebar header) is
+  never gradient.
+- Page pattern: module pages use the shared scaffolding in
+  `src/components/alfie-ui.tsx` (`PageHeader`, `SectionLabel`), page titles
+  are text-2xl semibold tracking-tight, and file workspaces (a journal
+  entry, a vendor bill, a customer account) put the file itself in the centre canvas with a
+  `ReviewBar` stating what needs a human decision, and the Alfie
+  conversation in a right rail tied to that file. Home is a queue first,
+  composer at the centre.
+- Type: Geist (variable, self-hosted via Fontsource; Inter remains the
+  fallback in the stack) for interface chrome, tables, and controls. Source Serif 4
+  (`--font-display`) for headings and for Alfie's drafted output, so
+  anything that reads like a document looks like one. Tabular numerals are
+  on globally so figures align like a ledger.
+- Readability floor: nothing renders below 12px. The small-text scale is
+  raised in @theme (text-xs is 13px, text-sm is 15px) and arbitrary sizes
+  start at text-[12px]. Secondary text (--muted-foreground) stays close to
+  the foreground in both modes (lightness 0.32 in light mode, 0.85 in
+  dark); do not reintroduce mid-grey secondary text or sub-12px sizes.
+- Controls and tables: native selects never use the browser's own dropdown
+  arrow; they carry the `select-chevron` utility from `src/styles.css`
+  (chevron at a fixed inset, right padding reserved, left padding only on
+  the element itself, never `px-*`, which overrides the reserved space).
+  Table headers never wrap (`th` is nowrap in the base layer). Module
+  pages share one container rhythm: `px-5 pt-8 pb-12 lg:px-10` inside
+  their max-width wrapper. Reports and documents are read in place through
+  preview dialogs (content lives in `reportContent` in reports-data.ts and
+  `documentPreviews` in workspace-data.ts); exports are secondary.
+- Previews: every file surface (Documents library, entry evidence,
+  bill documents, customer documents, report library) renders its
+  content through the shared `DocumentSheet` in
+  `src/components/document-view.tsx`, so a document or report is read
+  inside the software as a serif document sheet. Downloads and exports
+  stay available but secondary. Preview dialogs never carry a footer
+  Close button; closing is the dialog's corner X.
+
+## Conventions
+
+- Frontend only (decided by the user, 2026-11-15): build pages, flows and
+  interactions with local state and sample data. Do NOT build backend
+  services, APIs, databases or connectors; critical backend work is
+  reserved for the engineering team. Where a flow would need a backend,
+  set up the full frontend experience and label it plainly in the UI as
+  sample or browser-local state.
+- No em dashes in user-facing copy.
+- Sample data is illustrative and labelled as such in the UI until real
+  systems are connected through Data Sources.
+- Reporting and analysis are read-only: modules never silently modify
+  accounting, treasury, payables, receivables or planning records. Mutations go
+  through the relevant module's authorized workflow with approvals and audit.
