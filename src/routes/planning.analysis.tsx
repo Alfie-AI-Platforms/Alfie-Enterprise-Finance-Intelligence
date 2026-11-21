@@ -26,7 +26,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AlfieComposer, AttachmentChip, type Attachment } from "@/components/alfie-composer";
-import { PlanningNav, SampleDataNote } from "@/components/planning-nav";
+import { PlanningHeader, SampleDataNote } from "@/components/planning-nav";
 import {
   basePlanScenario,
   planningAudit,
@@ -332,7 +332,12 @@ function AnalysisWorkspace() {
   const [lastFiles, setLastFiles] = useState<Attachment[]>([]);
   const [audit, setAudit] = useState(planningAudit);
   const end = useRef<HTMLDivElement>(null);
+  const mounted = useRef(false);
   useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
     end.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, thinking]);
 
@@ -489,14 +494,15 @@ function AnalysisWorkspace() {
 
   return (
     <AppShell rightPanel={right}>
-      <div className="flex min-h-full flex-col">
-        <div className="border-b border-border px-5 pt-5 lg:px-8">
-          <PlanningNav />
-        </div>
-        <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-5 lg:px-8">
+      <div className="mx-auto flex min-h-full w-full max-w-7xl flex-col px-5 pt-8 lg:px-10">
+        <PlanningHeader
+          title="Planning Analysis"
+          subtitle="Analyze performance against the budget and the rolling forecast with Alfie, with the evidence attached. Analysis is read-only: it never changes the forecast, the budget or a forecast review."
+        />
+        <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col">
           <header className="flex flex-wrap items-start justify-between gap-3 py-5">
             <div>
-              <h1 className="text-xl font-semibold">FY2026 Forecast and Variance Analysis</h1>
+              <h2 className="text-xl font-semibold">FY2026 Forecast and Variance Analysis</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Performance against budget, the Q4 forecast review, and the assumptions the FY2027
                 budget rests on.
