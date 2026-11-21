@@ -74,7 +74,6 @@ function ReconciliationsPage() {
     <AppShell>
       <div className="mx-auto max-w-7xl px-5 pb-12 pt-8 lg:px-10">
         <PageHeader
-          eyebrow="Work"
           title="Reconciliations"
           description="Every bank, card, subledger and control account for Meridian Group, matched continuously by Alfie, with one exceptions queue for the lines a person needs to look at."
           actions={

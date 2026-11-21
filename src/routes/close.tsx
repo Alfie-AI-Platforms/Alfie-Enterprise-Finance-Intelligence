@@ -96,7 +96,6 @@ function ClosePage() {
     <AppShell>
       <div className="mx-auto max-w-7xl px-5 pb-12 pt-8 lg:px-10">
         <PageHeader
-          eyebrow="Work"
           title="Close"
           description="Month end close for Meridian Group, managed as a controlled process with owners, due dates, approvals and reconciliation status across all three entities."
         />

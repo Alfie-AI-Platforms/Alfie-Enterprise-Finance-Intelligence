@@ -75,7 +75,6 @@ function TreasuryPage() {
     <AppShell>
       <div className="mx-auto max-w-7xl px-5 pb-12 pt-8 lg:px-10">
         <PageHeader
-          eyebrow="Intelligence"
           title="Treasury"
           description="Cash position and liquidity for Meridian Group: every bank account, a rolling 13 week forecast, debt and covenant headroom, and the USD exposure that sits behind the consolidated numbers."
         />
