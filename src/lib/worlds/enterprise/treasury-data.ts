@@ -98,6 +98,26 @@ export const termLoan = {
   note: "The Q3 covenant calculation is complete and the certificate is in the lender compliance package in Reports. The November calculation is a close task owned by Tom Alvarez.",
 };
 
+export type TreasuryCopy = {
+  metaDescription: string;
+  headerDescription: string;
+  forecastLow: string;
+  covenantKpi: string;
+  covenantLine: string;
+  explainPrompt: string;
+};
+
+export const treasuryCopy: TreasuryCopy = {
+  metaDescription:
+    "Cash across every Meridian bank account, a 13 week forecast, term loan covenant headroom and USD exposure.",
+  headerDescription:
+    "Cash position and liquidity for Meridian Group: every bank account, a rolling 13 week forecast, debt and covenant headroom, and the USD exposure that sits behind the consolidated numbers.",
+  forecastLow: "$11.2M in week 9",
+  covenantKpi: "2.1x of 3.0x max",
+  covenantLine: "Leverage at 2.1x against the 3.0x maximum.",
+  explainPrompt: "Explain the 13 week cash forecast and why week 9 is the lowest point.",
+};
+
 export const usdExposure = {
   usdCash: "US$4.04M",
   usdCashCad: "$5.5M CAD equivalent at 1.36",

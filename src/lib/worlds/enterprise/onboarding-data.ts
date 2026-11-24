@@ -76,3 +76,6 @@ export const implementationTeam: { name: string; role: string; note: string }[] 
   { name: "Elena Brooks", role: "Meridian sponsor", note: "VP Finance and Organization Administrator. Owns sign-off for access, billing and go-live." },
   { name: "Meridian finance systems team", role: "Source systems", note: "Owns the NetSuite, QuickBooks and ADP extracts and the bank feed connections." },
 ];
+
+export const onboardingSummary =
+  "Pilot group is live in Accounting. Remaining: Concur sync health, Retail migration validation, agent activation, training and sign-off. Go-live target Jan 15, 2027.";

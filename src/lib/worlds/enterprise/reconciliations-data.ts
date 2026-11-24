@@ -138,3 +138,23 @@ export const alfieRecNotes = [
   "Two of the six exceptions need no journal entry at all: the payroll clearing difference and the POS timing difference clear on the next statement import. Alfie marks these so the team does not chase them.",
   "The only exception that changes the books is the October intercompany difference, and its correction already exists as JE-2026-1087 with approvals attached.",
 ] as const;
+
+// Route content for the Reconciliations page. World-specific narrative
+// lives here so the route stays world-agnostic.
+export type RecCorrectionLink = { exceptionId: string; entryId: string };
+
+export const recMetaDescription =
+  "Bank, subledger and control account reconciliations for Meridian Group, with continuous auto-matching and one exceptions queue.";
+
+export const recDescription =
+  "Every bank, card, subledger and control account for Meridian Group, matched continuously by Alfie, with one exceptions queue for the lines a person needs to look at.";
+
+export const recRunNote =
+  "Matching run completed just now. No new exceptions; the six open exceptions below are unchanged.";
+
+export const recFlagshipPrompt = {
+  label: "Explain the payroll clearing difference",
+  prompt: "Explain the payroll clearing difference of $3,215 and whether it needs a journal entry.",
+};
+
+export const recCorrectionLink: RecCorrectionLink | null = { exceptionId: "EX-03", entryId: "JE-2026-1087" };

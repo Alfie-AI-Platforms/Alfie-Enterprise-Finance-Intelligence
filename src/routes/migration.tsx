@@ -9,6 +9,7 @@ import {
   migrationProjects,
   type PhaseState,
 } from "@/lib/migration-data";
+import { activeWorkspace } from "@/lib/workspace";
 
 export const Route = createFileRoute("/migration")({ component: MigrationPage });
 
@@ -48,13 +49,14 @@ function MigrationPage() {
     (sum, p) => sum + p.objects.reduce((s, o) => s + o.exceptions, 0),
     0,
   );
+  const nextProject = migrationProjects.find((p) => p.status !== "Complete");
 
   return (
     <AppShell>
       <div className="mx-auto max-w-7xl px-5 pb-12 pt-8 lg:px-10">
         <PageHeader
           title="Migration"
-          description="Moving Meridian's entity data from its previous systems onto the group NetSuite ledger and Alfie. Each migration runs as a project with trial loads and reconciliation before anything switches. The source system is never written to."
+          description={`Moving ${activeWorkspace.companyShort}'s entity data from its previous systems onto the group ledger and Alfie. Each migration runs as a project with trial loads and reconciliation before anything switches. The source system is never written to.`}
         />
         <p className="mt-3 rounded-xl bg-secondary/60 px-4 py-2.5 text-[13px] leading-5 text-muted-foreground">
           Sample migration records. This console sets out the projects, phases and evidence; the
@@ -64,10 +66,10 @@ function MigrationPage() {
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[
-            ["Migration projects", String(migrationProjects.length), "Retail QuickBooks to NetSuite, the historical AP archive and Logistics payroll history."],
+            ["Migration projects", String(migrationProjects.length), migrationProjects.map((p) => p.name).join(" · ")],
             ["Records moved", num(totalMoved), "Accounts, trial balances, bills and payment records loaded so far."],
-            ["Open exceptions", num(openExceptions), "Records flagged for business review. One is a money difference: a $1,240 trial balance gap across 3 accounts."],
-            ["Next cutover", "Dec 12, 2026", "Meridian Retail switches from QuickBooks to NetSuite, with a 30-day hypercare window."],
+            ["Open exceptions", num(openExceptions), "Records flagged for business review. Money differences block the full load until they are resolved."],
+            ["Next cutover", nextProject?.targetCutover ?? "", `${nextProject?.name ?? ""}, with a 30-day hypercare window.`],
           ].map(([label, value, detail]) => (
             <section key={label} className={card}>
               <p className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>

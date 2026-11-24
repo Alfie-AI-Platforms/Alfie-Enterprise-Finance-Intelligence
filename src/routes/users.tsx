@@ -25,7 +25,9 @@ import { WorkspaceStatusBadge } from "@/components/workspace-badges";
 import {
   accessReviews,
   departments,
+  inviteManagers,
   orgGroups,
+  orgProfile,
   orgUsers,
   roleTemplates,
   type OrgUser,
@@ -98,12 +100,12 @@ function UsersPage() {
     const user: OrgUser = {
       id: `USR-${100 + users.length}`,
       name: inviteName.trim(),
-      email: inviteEmail.trim() || "pending@meridiangroup.com",
+      email: inviteEmail.trim() || `pending@${orgProfile.domain}`,
       employeeId: "Assigned on activation",
       title: inviteRole,
       department: inviteDept,
       roles: [inviteRole],
-      manager: "Elena Brooks",
+      manager: inviteManagers[0]!,
       status: "Invited",
       invitation: `Sent today, expires in ${inviteExpiry}`,
       added: "Today",
@@ -503,7 +505,7 @@ function UsersPage() {
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
                 className={`${inputCls} mt-1`}
-                placeholder="name@meridiangroup.com"
+                placeholder={`name@${orgProfile.domain}`}
               />
             </label>
             <label className="block text-xs font-medium">
@@ -532,11 +534,10 @@ function UsersPage() {
             </label>
             <label className="block text-xs font-medium">
               Manager
-              <select className={`${selectCls} mt-1`} defaultValue="Elena Brooks">
-                <option>Elena Brooks</option>
-                <option>Marcus Webb</option>
-                <option>Rachel Kim</option>
-                <option>Grace Liu</option>
+              <select className={`${selectCls} mt-1`} defaultValue={inviteManagers[0]}>
+                {inviteManagers.map((m) => (
+                  <option key={m}>{m}</option>
+                ))}
               </select>
             </label>
             <label className="block text-xs font-medium">

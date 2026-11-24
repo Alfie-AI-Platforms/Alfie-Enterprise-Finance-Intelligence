@@ -17,8 +17,10 @@ import {
   bankAccounts,
   forecastNote,
   forecastWeeks,
+  reportingFxRate,
   termLoan,
   totalCashCad,
+  treasuryCopy,
   treasuryScenarios,
   usdExposure,
 } from "@/lib/treasury-data";
@@ -29,8 +31,7 @@ export const Route = createFileRoute("/treasury")({
       { title: "Treasury | Alfie Enterprise Finance" },
       {
         name: "description",
-        content:
-          "Cash across every Meridian bank account, a 13 week forecast, term loan covenant headroom and USD exposure.",
+        content: treasuryCopy.metaDescription,
       },
       { property: "og:title", content: "Treasury | Alfie Enterprise Finance" },
       { property: "og:type", content: "website" },
@@ -74,10 +75,7 @@ function TreasuryPage() {
   return (
     <AppShell>
       <div className="mx-auto max-w-7xl px-5 pb-12 pt-8 lg:px-10">
-        <PageHeader
-          title="Treasury"
-          description="Cash position and liquidity for Meridian Group: every bank account, a rolling 13 week forecast, debt and covenant headroom, and the USD exposure that sits behind the consolidated numbers."
-        />
+        <PageHeader title="Treasury" description={treasuryCopy.headerDescription} />
         <p className="mt-4 flex items-center gap-1.5 text-[13px] text-muted-foreground">
           <Info className="size-3 shrink-0" />
           Illustrative sample data. Forecasts are estimates built from collection and payment
@@ -87,9 +85,9 @@ function TreasuryPage() {
         <div className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border lg:grid-cols-4">
           {[
             ["Current cash, CAD equivalent", `$${totalCashCad.toFixed(1)}M`],
-            ["Forecast low, next 13 weeks", "$11.2M in week 9"],
+            ["Forecast low, next 13 weeks", treasuryCopy.forecastLow],
             ["Term loan", termLoan.balance],
-            ["Leverage covenant", `${termLoan.leverage} of ${termLoan.covenantMax} max`],
+            ["Leverage covenant", treasuryCopy.covenantKpi],
           ].map(([label, value]) => (
             <div key={label} className="bg-card p-4">
               <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
@@ -103,7 +101,7 @@ function TreasuryPage() {
             <h3 className="text-sm font-semibold">Bank accounts</h3>
             <p className="text-[13px] text-muted-foreground">
               Balances in native currency, with the CAD equivalent used for consolidated reporting
-              at USD/CAD 1.36. Account detail and matching live in Reconciliations.
+              at USD/CAD {reportingFxRate}. Account detail and matching live in Reconciliations.
             </p>
           </div>
           <div className="overflow-x-auto">
@@ -177,7 +175,14 @@ function TreasuryPage() {
               <AreaChart data={points}>
                 <CartesianGrid stroke="var(--border)" vertical={false} />
                 <XAxis dataKey="week" {...axis} />
-                <YAxis {...axis} width={34} domain={[8, 20]} />
+                <YAxis
+                  {...axis}
+                  width={34}
+                  domain={[
+                    Math.floor(Math.min(...forecastWeeks.map((w) => w.balance))) - 3,
+                    Math.ceil(Math.max(...forecastWeeks.map((w) => w.balance))) + 2,
+                  ]}
+                />
                 <Tooltip {...tip} />
                 <Area
                   dataKey="balance"
@@ -213,9 +218,7 @@ function TreasuryPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() =>
-                open("Explain the 13 week cash forecast and why week 9 is the lowest point.")
-              }
+              onClick={() => open(treasuryCopy.explainPrompt)}
             >
               Explain this forecast with Alfie
             </Button>
@@ -255,7 +258,7 @@ function TreasuryPage() {
               <div className="h-2 rounded-full bg-primary" style={{ width: "70%" }} />
             </div>
             <p className="mt-1.5 text-[13px] text-muted-foreground">
-              Leverage at 2.1x against the 3.0x maximum. {termLoan.testDate}.
+              {treasuryCopy.covenantLine} {termLoan.testDate}.
             </p>
             <p className="mt-2 text-[13px] leading-5 text-muted-foreground">{termLoan.note}</p>
           </section>

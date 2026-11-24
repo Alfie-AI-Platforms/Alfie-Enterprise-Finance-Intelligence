@@ -14,6 +14,7 @@ import { DocumentSheet } from "@/components/document-view";
 import { PlanningHeader, SampleDataNote, card, selectCls } from "@/components/planning-nav";
 import { entities } from "@/lib/planning-data";
 import {
+  planningGeneratedReport,
   planningReportLibrary,
   scheduledPlanningReports,
   type PlanningReportItem,
@@ -56,17 +57,17 @@ function PlanningReportsPage() {
       name: `${gEntity} ${gCategory} Report, ${gPeriod}`,
       category: gCategory,
       period: gPeriod,
-      owner: "Grace Liu",
+      owner: planningGeneratedReport.owner,
       status: "Draft",
       updated: "Nov 16, 2026",
       parameters: `${gEntity}, ${gPeriod}, basis ${gBasis}, org metric definitions, sources preserved`,
       summary: entity
         ? `${entity.entity} revenue is $${entity.revenue.toFixed(1)}M year to date against a $${entity.budget.toFixed(1)}M budget, with gross margin of ${entity.grossMargin.toFixed(1)}% and an EBITDA margin of ${entity.ebitdaMargin.toFixed(1)}%. This draft was generated on the ${gBasis} basis for ${gPeriod}.`
-        : `Group revenue is $102.6M year to date against a $99.4M budget, gross margin is 41.2% and EBITDA is $12.9M. This draft was generated on the ${gBasis} basis for ${gPeriod}.`,
+        : `${planningGeneratedReport.groupSummary} This draft was generated on the ${gBasis} basis for ${gPeriod}.`,
       sections: [
         {
           heading: "Basis and sources",
-          body: `Parameters preserved with this report: ${gEntity}, ${gPeriod}, basis ${gBasis}. Sources: NetSuite (primary GL), Salesforce order book, TD and Chase bank feeds. Retail figures rely on spreadsheet uploads until the QuickBooks connection is restored, and November expenses are estimated while the Concur sync is stale.`,
+          body: `Parameters preserved with this report: ${gEntity}, ${gPeriod}, basis ${gBasis}. Sources: ${planningGeneratedReport.sourcesNote}`,
         },
         {
           heading: "Limitations",

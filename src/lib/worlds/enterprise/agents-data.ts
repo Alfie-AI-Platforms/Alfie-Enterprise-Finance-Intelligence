@@ -16,3 +16,41 @@ export const knowledgeOptions = ["Accounting policies manual", "Approval policie
 export const dataAccessOptions = ["Read journal entries", "Read bank transactions", "Read vendor bills", "Read customer invoices", "Read documents", "Read budgets and forecasts"];
 export const actionOptions = ["Prepare journal entry", "Prepare bill approval", "Draft collection follow-up", "Prepare reconciliation", "Prepare report", "Send notification", "Update close checklist", "Request information", "Prepare payment run", "Flag exception"];
 export const workflowBlocks = ["New Bill", "Retrieve Vendor Record", "Extract Invoice", "Three-Way Match", "Check Approval Policy", "Decision", "Human Review", "Prepare Approval", "Record Outcome"];
+
+// ---------- Agent test page scenario ----------
+import { Database, FileText, Wrench, type LucideIcon } from "lucide-react";
+
+export type AgentTestScenario = {
+  agentName: string;
+  prompt: string;
+  trace: { icon: LucideIcon; title: string; copy: string }[];
+  intro: string;
+  points: { lead: string; text: string }[];
+};
+
+export const agentTestScenario: AgentTestScenario = {
+  agentName: "Reconciliation Agent",
+  prompt: "Review the payroll clearing exception of $3,215 and tell me what requires attention.",
+  trace: [
+    { icon: FileText, title: "Knowledge", copy: "Accounting Policies Manual v5 · Close Procedures" },
+    { icon: Database, title: "Data accessed", copy: "Bank transactions · Ledger postings · Reconciliation history" },
+    { icon: Wrench, title: "Actions", copy: "Read-only retrieval · Analysis" },
+    { icon: ShieldCheck, title: "Permission result", copy: "Write actions blocked · Approval enforced" },
+  ],
+  intro:
+    "I reviewed the payroll clearing account against the bank feed and the November ledger postings. Three items require attention:",
+  points: [
+    {
+      lead: "Root cause:",
+      text: "A payroll tax remittance of $3,215 appears in the bank feed for the Nov 14 payroll run but has not been posted in NetSuite, so the clearing account carries the difference.",
+    },
+    {
+      lead: "Missing documentation:",
+      text: "The payroll register for the Nov 14 run is not yet in Documents, so the posting cannot be verified against source.",
+    },
+    {
+      lead: "Next step:",
+      text: "A correcting entry is drafted for the Controller. The exception stays open on the reconciliation until it posts.",
+    },
+  ],
+};

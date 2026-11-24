@@ -289,8 +289,8 @@ function PermissionsPage() {
               <p className="text-xs font-semibold">Recent access denials</p>
               <ul className="mt-1.5 space-y-1 text-[13px] leading-4 text-muted-foreground">
                 <li>
-                  Nov 14: FP&A Analysis Agent denied QuickBooks data for Meridian Retail,
-                  credential expired at the source.
+                  Nov 14: FP&A Analysis Agent denied legacy ledger data for the entity
+                  still migrating, credential expired at the source.
                 </li>
                 <li>
                   Nov 13: Accountant role denied Execute on Data Sources, after the Nov 13

@@ -569,6 +569,66 @@ export const entries: JournalEntry[] = [
   },
 ];
 
+// Route content for the Accounting pages (register and entry workspace).
+// World-specific narrative lives here so the routes stay world-agnostic.
+
+export type AccountingAnswer = { intro: string; note: string };
+
+export type AccountingAnswers = {
+  flagship: AccountingAnswer;
+  approval: AccountingAnswer;
+  postClose: AccountingAnswer;
+  attention: AccountingAnswer;
+};
+
+export const flagshipEntryId = "JE-2026-1087";
+
+export const flagshipKeywords: readonly string[] = ["intercompany", "difference"];
+
+export const flagshipPrompt = "Explain the intercompany difference.";
+
+export const accountingMetrics: readonly (readonly [string, string, string, boolean])[] = [["Open Entries", "6", "November and post-close", true], ["Needs Review", "3", "+1 today", true], ["Awaiting Approval", "1", "With the CFO", true], ["Post-Close Adjustments", "3", "October period", true], ["Posted in October", "5", "In this register", false]];
+
+export const accountingExamples: readonly string[] = ["Show me the entries that need my attention today.", "Explain the intercompany difference.", "Which entries are waiting on approval?", "Show me the open post-close adjustments."];
+
+export const accountingAnswers: AccountingAnswers = {
+  flagship: {
+    intro: "The intercompany difference sits in JE-2026-1087, the October post-close adjustment Alfie prepared.",
+    note: "Manufacturing carries the receivable at $412,600; Logistics carries the payable at $394,200 after conversion. Alfie traced the $18,400 gap to the missing October 31 FX revaluation on the USD balance. Sources: intercompany balance report, FX rates for October 2026.",
+  },
+  approval: {
+    intro: "2 entries are in the approval path.",
+    note: "JE-2026-1095 ($58,900) is with the CFO. JE-2026-1087 ($18,400) needs CFO approval after Controller review because it is a post-close adjustment above the $10,000 threshold.",
+  },
+  postClose: {
+    intro: "3 October post-close adjustments are still open.",
+    note: "October closed in 6 days against the 8 day target. Post-close adjustments above $10,000 need Controller review and CFO approval before they post.",
+  },
+  attention: {
+    intro: "You have 3 entries that need your attention today, based on status, priority, and the close calendar.",
+    note: "JE-2026-1087 is the only open item blocking the October intercompany elimination. Sources: journal register, close checklist.",
+  },
+};
+
+export const newEntryDefaults = { preparedBy: "Elena Brooks", reviewer: "Marcus Webb", firstNumber: 1099 };
+
+export const erpName = "NetSuite";
+
+export const entryPrompts: readonly string[] = ["Analyze this entry.", "What requires my attention?", "Explain the intercompany difference.", "Walk me through the entry lines.", "Check this entry against policy.", "What information is missing?", "Prepare a summary for the CFO."];
+
+export const entryWorkflow: readonly string[] = ["Prepared", "Evidence Attached", "Alfie Analysis", "Controller Review", "CFO Approval", "Posted to NetSuite", "Closed"];
+
+export const flagshipIssue = "The intercompany pair does not agree until this entry posts.";
+
+export const flagshipRouteNext = "Route to James Whitfield (CFO) after Controller review.";
+
+export const flagshipMissingItems: string[] = ["Controller review has not yet been recorded (Marcus Webb).", "CFO approval is outstanding (James Whitfield), required above the $10,000 post-close threshold."];
+
+export const flagshipReviewBar = {
+  title: "Intercompany difference of $18,400 needs a correction decision",
+  detail: "Alfie traced the gap between Manufacturing and Logistics to a missing October 31 FX revaluation and prepared this entry. As a post-close adjustment above the $10,000 threshold, it also needs CFO approval after Controller review.",
+};
+
 export const getEntry = (id: string) => entries.find((entry) => entry.id === id);
 export const money = (value: number) => `${value < 0 ? "-" : ""}$${Math.abs(value).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 

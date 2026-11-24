@@ -682,3 +682,55 @@ export const retentionPolicies = [
     hold: "Preserved with the user record",
   },
 ];
+
+// ---------- Settings, users and automations page content ----------
+export type OrgProfile = {
+  name: string;
+  legalName: string;
+  identifier: string;
+  industry: string;
+  address: string;
+  email: string;
+  phone: string;
+  domain: string;
+  erpName: string;
+};
+
+export const orgProfile: OrgProfile = {
+  name: "Meridian Group",
+  legalName: "Meridian Group Inc.",
+  identifier: "MG-ORG-2026-001",
+  industry: "Manufacturing, logistics and retail",
+  address: "480 King Street West, Toronto, ON",
+  email: "finance@meridiangroup.com",
+  phone: "+1 416 555 0100",
+  domain: "meridiangroup.com",
+  erpName: "NetSuite",
+};
+
+export const alfieInstructions =
+  "Use Meridian Group terminology. Refer to the three entities by their full names. Escalate any journal entry unapproved for more than 2 business days to the Controller. Never present sample or stale data as current: name the source and its sync time.";
+
+export const openIncident =
+  "Open incident: Concur expense synchronization has been stale for 3 days, and the QuickBooks credential for Meridian Retail has expired. Owner: Elena Brooks. Alfie marks data from these sources as stale wherever it would be used.";
+
+export const inviteManagers = ["Elena Brooks", "Marcus Webb", "Rachel Kim", "Grace Liu"];
+
+export const automationAgentChoices = [
+  "Reconciliation Agent",
+  "Close Agent",
+  "AP Processing Agent",
+  "AR Collections Agent",
+  "FP&A Analysis Agent",
+  "Treasury Agent",
+  "Compliance Monitoring Agent",
+];
+
+export const automationSourceChoices = [
+  "NetSuite",
+  "TD Bank Feed",
+  "Chase Bank Feed",
+  "Salesforce",
+  "Concur Expenses",
+  "SharePoint Document Library",
+];

@@ -7,25 +7,22 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlfieComposer, AttachmentChip, type Attachment } from "@/components/alfie-composer";
 import { EntryStatusBadge, PriorityBadge } from "@/components/accounting-badges";
-import { entries as seedEntries, entryStatuses, entities, money, type EntryStatus, type JournalEntry } from "@/lib/accounting-data";
+import { accountingAnswers, accountingExamples, accountingMetrics, entries as seedEntries, entryStatuses, entities, flagshipEntryId, flagshipKeywords, money, newEntryDefaults, type EntryStatus, type JournalEntry } from "@/lib/accounting-data";
 
 export const Route = createFileRoute("/accounting/")({
   head: () => ({ meta: [{ title: "Accounting | Alfie Enterprise Finance" }, { name: "description", content: "Review, approve, and post journal entries with Alfie." }, { property: "og:title", content: "Accounting | Alfie Enterprise Finance" }, { property: "og:description", content: "An AI-powered journal entry workspace for review, approval, and posting." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AccountingPage,
 });
 
-const metrics: readonly (readonly [string, string, string, boolean])[] = [["Open Entries", "6", "November and post-close", true], ["Needs Review", "3", "+1 today", true], ["Awaiting Approval", "1", "With the CFO", true], ["Post-Close Adjustments", "3", "October period", true], ["Posted in October", "5", "In this register", false]];
-const examples = ["Show me the entries that need my attention today.", "Explain the intercompany difference.", "Which entries are waiting on approval?", "Show me the open post-close adjustments."];
-
 type Answer = { prompt: string; files: Attachment[]; intro: string; rows: JournalEntry[]; note: string };
 
 function answerFor(prompt: string, all: JournalEntry[]): Omit<Answer, "prompt" | "files"> {
   const p = prompt.toLowerCase();
   const open = all.filter((e) => e.status !== "Posted");
-  if (p.includes("intercompany") || p.includes("difference")) return { intro: "The intercompany difference sits in JE-2026-1087, the October post-close adjustment Alfie prepared.", rows: all.filter((e) => e.id === "JE-2026-1087"), note: "Manufacturing carries the receivable at $412,600; Logistics carries the payable at $394,200 after conversion. Alfie traced the $18,400 gap to the missing October 31 FX revaluation on the USD balance. Sources: intercompany balance report, FX rates for October 2026." };
-  if (p.includes("approval") || p.includes("waiting")) return { intro: "2 entries are in the approval path.", rows: open.filter((e) => e.status === "Awaiting Approval" || e.id === "JE-2026-1087"), note: "JE-2026-1095 ($58,900) is with the CFO. JE-2026-1087 ($18,400) needs CFO approval after Controller review because it is a post-close adjustment above the $10,000 threshold." };
-  if (p.includes("post-close") || p.includes("post close")) return { intro: "3 October post-close adjustments are still open.", rows: open.filter((e) => e.period.includes("Post-close")), note: "October closed in 6 days against the 8 day target. Post-close adjustments above $10,000 need Controller review and CFO approval before they post." };
-  return { intro: "You have 3 entries that need your attention today, based on status, priority, and the close calendar.", rows: open.filter((e) => e.status === "Needs Review").slice(0, 3), note: "JE-2026-1087 is the only open item blocking the October intercompany elimination. Sources: journal register, close checklist." };
+  if (flagshipKeywords.some((k) => p.includes(k))) return { intro: accountingAnswers.flagship.intro, rows: all.filter((e) => e.id === flagshipEntryId), note: accountingAnswers.flagship.note };
+  if (p.includes("approval") || p.includes("waiting")) return { intro: accountingAnswers.approval.intro, rows: open.filter((e) => e.status === "Awaiting Approval" || e.id === flagshipEntryId), note: accountingAnswers.approval.note };
+  if (p.includes("post-close") || p.includes("post close")) return { intro: accountingAnswers.postClose.intro, rows: open.filter((e) => e.period.includes("Post-close")), note: accountingAnswers.postClose.note };
+  return { intro: accountingAnswers.attention.intro, rows: open.filter((e) => e.status === "Needs Review").slice(0, 3), note: accountingAnswers.attention.note };
 }
 
 function AccountingPage() {
@@ -42,7 +39,7 @@ function AccountingPage() {
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [thinking, setThinking] = useState(false);
   const [newOpen, setNewOpen] = useState(false);
-  const [form, setForm] = useState({ title: "", type: "Accrual", entity: "Meridian Manufacturing Inc.", amount: "" });
+  const [form, setForm] = useState({ title: "", type: "Accrual", entity: entities[0] ?? "", amount: "" });
 
   const types = [...new Set(rows.map((e) => e.type))];
   const reviewers = [...new Set(rows.map((e) => e.reviewer))];
@@ -56,10 +53,10 @@ function AccountingPage() {
   };
   const searchSubmit = () => { if (search.trim().split(" ").length > 3) { ask(search); setSearch(""); } };
   const createEntry = () => {
-    const id = `JE-2026-${1099 + rows.length - seedEntries.length}`;
-    setRows((r) => [{ id, title: form.title || "New journal entry", type: form.type, entity: form.entity, status: "In Preparation", priority: "Medium", preparedBy: "Elena Brooks", reviewer: "Marcus Webb", updated: "Just now", updatedDays: 0, period: "November 2026", entryDate: "November 30, 2026", amount: Number(form.amount) || 0, source: "Manual entry", lines: [], evidence: [], analysis: { intro: "This entry was created manually and has no Alfie analysis yet.", items: [], next: "Complete the entry lines and route for review.", confidence: "Low", sources: [] } }, ...r]);
+    const id = `JE-2026-${String(newEntryDefaults.firstNumber + rows.length - seedEntries.length).padStart(4, "0")}`;
+    setRows((r) => [{ id, title: form.title || "New journal entry", type: form.type, entity: form.entity, status: "In Preparation", priority: "Medium", preparedBy: newEntryDefaults.preparedBy, reviewer: newEntryDefaults.reviewer, updated: "Just now", updatedDays: 0, period: "November 2026", entryDate: "November 30, 2026", amount: Number(form.amount) || 0, source: "Manual entry", lines: [], evidence: [], analysis: { intro: "This entry was created manually and has no Alfie analysis yet.", items: [], next: "Complete the entry lines and route for review.", confidence: "Low", sources: [] } }, ...r]);
     setNewOpen(false);
-    setForm({ title: "", type: "Accrual", entity: "Meridian Manufacturing Inc.", amount: "" });
+    setForm({ title: "", type: "Accrual", entity: entities[0] ?? "", amount: "" });
   };
   const selectCls = "select-chevron h-8 rounded-lg border border-border bg-background pl-2.5 text-xs text-foreground outline-none focus:border-ring";
 
@@ -68,12 +65,12 @@ function AccountingPage() {
 
     <div className="relative mt-6"><Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><input value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && searchSubmit()} placeholder="Search entries, accounts, entities, or ask Alfie…" aria-label="Search entries" className="h-11 w-full rounded-xl border border-border bg-secondary/50 pl-10 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:border-ring" /></div>
 
-    <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-3 lg:grid-cols-5">{metrics.map(([label, value, trend, up]) => <div key={label} className="bg-card p-4"><p className="text-[13px] font-medium text-muted-foreground">{label}</p><p className="mt-1.5 text-2xl font-semibold">{value}</p><p className="mt-1 flex items-center gap-0.5 text-[12px] text-muted-foreground">{up ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}{trend}</p></div>)}</div>
+    <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-3 lg:grid-cols-5">{accountingMetrics.map(([label, value, trend, up]) => <div key={label} className="bg-card p-4"><p className="text-[13px] font-medium text-muted-foreground">{label}</p><p className="mt-1.5 text-2xl font-semibold">{value}</p><p className="mt-1 flex items-center gap-0.5 text-[12px] text-muted-foreground">{up ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}{trend}</p></div>)}</div>
 
     <section className="mt-6 rounded-2xl border border-border bg-panel p-4">
       <div className="mb-3 flex items-center gap-2"><AlfieMark /><h2 className="text-sm font-semibold">Ask Alfie about your entries</h2></div>
       <AlfieComposer value={prompt} onChange={setPrompt} onSend={ask} placeholder="Ask Alfie about your entries…" />
-      <div className="mt-3 flex flex-wrap gap-2">{examples.map((ex) => <Button key={ex} variant="secondary" size="sm" className="h-auto whitespace-normal py-1.5 text-left font-normal" onClick={() => ask(ex)}><Sparkle className="size-3 shrink-0 text-primary" />{ex}</Button>)}</div>
+      <div className="mt-3 flex flex-wrap gap-2">{accountingExamples.map((ex) => <Button key={ex} variant="secondary" size="sm" className="h-auto whitespace-normal py-1.5 text-left font-normal" onClick={() => ask(ex)}><Sparkle className="size-3 shrink-0 text-primary" />{ex}</Button>)}</div>
       {thinking ? <p className="mt-4 animate-pulse text-xs text-muted-foreground">Alfie is reviewing the journal register…</p> : null}
       {answers.map((a, i) => <div key={i} className="mt-4 rounded-xl border border-border bg-card p-4">
         <div className="flex items-start justify-between gap-3"><p className="text-xs text-muted-foreground"><span className="font-semibold text-foreground">You:</span> {a.prompt}</p><button aria-label="Dismiss" onClick={() => setAnswers((x) => x.filter((_, j) => j !== i))} className="text-muted-foreground hover:text-foreground"><X className="size-3.5" /></button></div>

@@ -18,7 +18,7 @@ export function AgentBuilder({ editing = false }: { editing?: boolean }) {
   const [description, setDescription] = useState("Matches bank and subledger activity to the ledger, isolates exceptions, and prepares reconciliation reviews for sign-off.");
   const [department, setDepartment] = useState("Reconciliations");
   const [objective, setObjective] = useState("Review unmatched bank and subledger activity, identify missing information, flag unusual items, and prepare a reconciliation review for the Controller. Do not post adjustments to the ledger.");
-  const [selectedKnowledge, setSelectedKnowledge] = useState(["Accounting policies manual", "NetSuite general ledger", "Bank feeds"]);
+  const [selectedKnowledge, setSelectedKnowledge] = useState(["Accounting policies manual", knowledgeOptions.find((o) => o.includes("general ledger")) ?? "Bank feeds", "Bank feeds"]);
   const [dataAccess, setDataAccess] = useState(dataAccessOptions.slice(0, 4));
   const [actions, setActions] = useState(["Prepare reconciliation", "Flag exception", "Prepare report", "Request information"]);
   const [approvals, setApprovals] = useState(["Prepare reconciliation"]);

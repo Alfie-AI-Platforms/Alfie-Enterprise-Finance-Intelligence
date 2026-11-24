@@ -535,3 +535,399 @@ export const scheduledPlanningReports = [
   { name: "Quarterly Forecast Pack", schedule: "Quarterly, with the forecast review", lastRun: "Oct 20, delivered with FR-2026-005 accuracy review", status: "Active" },
   { name: "Board Finance Pack", schedule: "Monthly, ahead of the board meeting", lastRun: "Nov 13, October pack delivered", status: "Active" },
 ];
+
+// ---------- Planning overview (index page) ----------
+export const planningPrompts = [
+  "Explain our revenue variance against budget year to date.",
+  "Why was October the only month below budget?",
+  "What is driving our gross margin against budget?",
+  "Walk me through the Q4 forecast review FR-2026-011.",
+  "What happens to FY2027 EBITDA if steel prices rise 8%?",
+  "Compare forecast accuracy for Q3 against the published forecast.",
+  "Summarize the FY2027 budget and its main assumptions.",
+  "Which entity is furthest ahead of budget, and why?",
+];
+
+export type PlanningOverview = {
+  budgetGrossMargin: number; // %, the budget reference line on the margin trend chart
+  groupVarianceNote: string;
+  entityNote: string;
+};
+
+export const planningOverview: PlanningOverview = {
+  budgetGrossMargin: 40.8,
+  groupVarianceNote: "Group variance is +$3.2M.",
+  entityNote:
+    "All three entities are ahead of budget. Logistics has the largest percentage beat, on contract volume that also drives the Q4 forecast review.",
+};
+
+// ---------- Forecast review page ----------
+export type PlanningApprovalImpact = {
+  reviewId: string;
+  rows: [string, string, string][];
+};
+
+export const planningApprovalImpact: PlanningApprovalImpact = {
+  reviewId: "FR-2026-011",
+  rows: [
+    ["Q4 revenue forecast", "$28.5M", "$29.0M"],
+    ["FY2026 forecast revenue", "$121.3M", "$121.8M"],
+    ["Gross margin, base case", "41.2%", "41.2% (downside 39.8%)"],
+  ],
+};
+
+export const planningReviewDefaults = {
+  groupScope: "Group, all entities",
+  owner: "Grace Liu",
+};
+
+// ---------- Generated planning reports ----------
+export const planningGeneratedReport = {
+  owner: "Grace Liu",
+  groupSummary:
+    "Group revenue is $102.6M year to date against a $99.4M budget, gross margin is 41.2% and EBITDA is $12.9M.",
+  sourcesNote:
+    "NetSuite (primary GL), Salesforce order book, TD and Chase bank feeds. Retail figures rely on spreadsheet uploads until the QuickBooks connection is restored, and November expenses are estimated while the Concur sync is stale.",
+};
+
+// ---------- Scenario modeling copy ----------
+/** The downside preset inputs, applied on top of the builder's current values. */
+export const planDownsideOverrides: Partial<PlanScenarioInputs> = { steelPct: 8, fxRate: 1.42 };
+/** The volume upside preset inputs, applied on top of the builder's current values. */
+export const planUpsideOverrides: Partial<PlanScenarioInputs> = { steelPct: 0, fxRate: 1.36, volumePct: 4 };
+
+export type ScenarioCopy = {
+  costInputLabel: string;
+  costInputName: string;
+  costInputTitle: string;
+  volumeHint: string;
+  costHint: string;
+  downsideLabel: string;
+  alfieNote: string;
+  sensitivityNote: string;
+  comparisonNote: string;
+  driverRevenuePhrase: string;
+  driverMarginPhrase: string;
+};
+
+export const scenarioCopy: ScenarioCopy = {
+  costInputLabel: "Steel price change",
+  costInputName: "steel",
+  costInputTitle: "Steel",
+  volumeHint:
+    "Shipped and billed volume across the group. Scenario C tests +4% from the prospective Logistics contracts.",
+  costHint:
+    "Steel is 18% of revenue in Manufacturing costs, so each 1% on steel is about 0.18 points of gross margin.",
+  downsideLabel: "Downside, steel and FX",
+  alfieNote:
+    "Scenario B (steel +8%, USD/CAD 1.42) is the downside attached to forecast review FR-2026-011 and the downside case in Treasury. Alfie recommends keeping Scenario C (volume upside) out of the approval pack until the Logistics contracts are signed: it models the revenue without the hiring and capex needed to serve it. Neither scenario changes anything in the budget or forecast on its own.",
+  sensitivityNote:
+    "One variable at a time, everything else held at the builder values. Each 5 points on steel is about 0.9 points of gross margin, which is the sensitivity finding Alfie carries into the forecast review and the budget book appendix.",
+  comparisonNote:
+    "All scenarios share the FY2027 budget baseline and the stated assumptions. Under those assumptions the strongest EBITDA comes from the volume upside, and the weakest from the steel downside, even though downside revenue is higher. That trade-off is the decision, and it belongs to the Forecast Review, not to this page.",
+  driverRevenuePhrase: "on translation and volume",
+  driverMarginPhrase: "on input costs",
+};
+
+// ---------- Planning Analysis conversation ----------
+export type AnalysisSection = { title: string; items: string[] };
+export type AnalysisReply = {
+  intro: string;
+  sections?: AnalysisSection[];
+  table?: string[][];
+  confidence?: string;
+  limitations?: string[];
+  sources?: string[];
+  agents?: string[];
+  actions?: string[];
+};
+
+export type PlanningAnalysisContext = {
+  title: string;
+  subtitle: string;
+  firstQuestion: string;
+  details: [string, string][];
+  groupInfo: [string, string][];
+  keyFindings: string[];
+};
+
+export const planningAnalysisContext: PlanningAnalysisContext = {
+  title: "FY2026 Forecast and Variance Analysis",
+  subtitle:
+    "Performance against budget, the Q4 forecast review, and the assumptions the FY2027 budget rests on.",
+  firstQuestion:
+    "Explain our performance against budget year to date and what needs attention before the Q4 forecast is approved.",
+  details: [
+    ["Analysis", "FY2026 Forecast and Variance"],
+    ["ID", "FA-2026-021"],
+    ["Scope", "Group, all entities"],
+    ["Reporting period", "Jan to Oct 2026"],
+    ["Created by", "Grace Liu"],
+    ["Created", "Nov 15, 2026"],
+    ["Last updated", "Just now"],
+    ["Status", "In progress"],
+  ],
+  groupInfo: [
+    ["YTD revenue", "$102.6M"],
+    ["YTD budget", "$99.4M"],
+    ["Gross margin", "41.2%"],
+    ["EBITDA", "$12.9M (12.6%)"],
+    ["Q4 forecast revenue", "$29.0M"],
+    ["FY2027 budget revenue", "$128.0M"],
+  ],
+  keyFindings: [
+    "Revenue +3.2% vs budget YTD; October the only month below budget.",
+    "Logistics is the largest percentage beat, +4.1%.",
+    "Steel at 18% of revenue is the main FY2027 margin exposure.",
+    "Retail actuals are 11 days old, QuickBooks authentication expired.",
+  ],
+};
+
+export const planningAnalysisFollowUps = [
+  "Why was October below budget?",
+  "What happens if steel prices rise 8%?",
+  "Walk me through FR-2026-011.",
+  "Compare Q3 forecast accuracy.",
+  "Summarize the FY2027 budget.",
+];
+
+/** Follow-up patterns that advance the analysis workflow stage in the page. */
+export const planningAnalysisPatterns = {
+  scenario: /scenario|steel|%|downside/i,
+  review: /fr-2026|review/i,
+};
+
+const pctFmt = (n: number) => `${n.toFixed(1)}%`;
+const moneyFmt = (n: number) => `$${n.toFixed(1)}M`;
+
+export function planningAnalysisReply(
+  q: string,
+  files: readonly { name: string }[],
+  turn: number,
+): AnalysisReply {
+  const p = q.toLowerCase();
+  if (files.length)
+    return {
+      intro: `I read ${files.length === 1 ? "the attached file" : `the ${files.length} attached files`} in the context of the FY2026 forecast analysis.`,
+      sections: [
+        {
+          title: "What I extracted",
+          items: files.map((f) =>
+            /budget/i.test(f.name)
+              ? `${f.name}: budget figures by entity and month; totals agree to the $99.4M YTD budget in NetSuite.`
+              : /forecast/i.test(f.name)
+                ? `${f.name}: forecast assumptions detected; the steel and FX assumptions match Scenario B.`
+                : /xlsx|csv/i.test(f.name)
+                  ? `${f.name}: structured data detected; columns mapped to entity, period, revenue and cost.`
+                  : `${f.name}: narrative content summarized; no conflicting assumptions found.`,
+          ),
+        },
+        {
+          title: "How it affects this analysis",
+          items: [
+            "Used as conversation context only, not added to the planning data in NetSuite.",
+            "Figures from uploaded files are treated as unverified until reconciled with source systems.",
+          ],
+        },
+      ],
+      confidence: "Moderate, uploaded data not yet reconciled",
+      sources: files.map((f) => f.name),
+      actions: ["Add to repository", "Ask Follow-up"],
+    };
+  if (p.includes("steel") || p.includes("downside") || p.includes("8%")) {
+    const b = runPlanScenario(basePlanScenario);
+    const d = runPlanScenario({ ...basePlanScenario, steelPct: 8, fxRate: 1.42 });
+    return {
+      intro:
+        "The downside scenario from Planning, applied to the FY2027 budget: steel prices up 8% and USD/CAD at 1.42, on the stated scenario assumptions.",
+      table: [
+        ["Metric", "FY2027 budget", "Downside"],
+        ["Revenue", moneyFmt(b.revenue), moneyFmt(d.revenue)],
+        ["Gross margin", pctFmt(b.grossMargin), pctFmt(d.grossMargin)],
+        ["EBITDA", moneyFmt(b.ebitda), moneyFmt(d.ebitda)],
+        ["EBITDA margin", pctFmt(b.ebitdaMargin), pctFmt(d.ebitdaMargin)],
+      ],
+      sections: [
+        {
+          title: "Interpretation",
+          items: [
+            "Revenue rises slightly because 27.2% of it is USD denominated and translates at a weaker CAD. Margin is where the downside lands: steel at 18% of revenue turns an 8% price rise into about 1.4 points of gross margin.",
+            "This is the scenario attached to FR-2026-011 and used as the downside case in Treasury, where the week 9 cash low falls to $9.6M.",
+          ],
+        },
+      ],
+      confidence: "Illustrative, simple arithmetic on stated assumptions, not a forecast",
+      limitations: ["Steel share and USD share are planning assumptions, reviewed in Forecast Reviews.", "No volume response to price changes is modeled."],
+      agents: ["Scenario Agent"],
+      sources: ["Scenario B", "NetSuite"],
+      actions: ["Open in Scenario Modeling", "Ask Follow-up"],
+    };
+  }
+  if (p.includes("october"))
+    return {
+      intro: "October 2026 is the only month this year below budget:",
+      table: [
+        ["Measure", "Actual", "Budget"],
+        ["Group revenue", "$9.8M", "$10.1M"],
+        ["Gross margin", "40.9%", "41.2%"],
+        ["EBITDA margin", "12.2%", "12.5%"],
+      ],
+      sections: [
+        {
+          title: "What happened",
+          items: [
+            "Manufacturing shipments scheduled for the last week of October slipped into November, taking about $0.4M of revenue with them.",
+            "Logistics and Retail were both within 1% of budget, so this is a timing story in one entity, not a demand problem.",
+          ],
+        },
+        {
+          title: "What FP&A did with it",
+          items: [
+            "No forecast change was made on October alone. The slipped shipments are counted once, in the Q4 forecast review FR-2026-011.",
+          ],
+        },
+      ],
+      confidence: "High",
+      agents: ["Variance Analysis Agent"],
+      sources: ["NetSuite", "Salesforce order book"],
+      actions: ["Open Forecast Review", "Ask Follow-up"],
+    };
+  if (p.includes("fr-2026-011") || p.includes("forecast review") || p.includes("q4"))
+    return {
+      intro:
+        "FR-2026-011 is the Q4 2026 forecast update, prepared by Grace Liu, and it is at the Approval stage:",
+      sections: [
+        {
+          title: "The proposal",
+          items: [
+            "Q4 revenue forecast raised from $28.5M to $29.0M, a change of +1.8%, on Logistics contract volume.",
+            "FY2026 forecast revenue becomes $121.8M. Gross margin is held at 41.2% in the base case.",
+          ],
+        },
+        {
+          title: "Evidence and approvals",
+          items: [
+            "October actuals are in and November is tracking ahead of the prior forecast.",
+            "The downside scenario (steel up 8%, USD/CAD 1.42) is attached at Elena Brooks' request, so the steel exposure is visible in the same pack.",
+            "The +1.8% change exceeds the FP&A Director authority of 1.5%, so approval sits with the VP Finance or CFO. Publishing follows CFO sign-off.",
+          ],
+        },
+      ],
+      confidence: "High for the revenue line; margin depends on steel prices holding",
+      limitations: ["Retail actuals are 11 days old because the QuickBooks connection has expired."],
+      agents: ["Forecasting Agent", "Variance Analysis Agent"],
+      sources: ["FR-2026-011", "Scenario B", "NetSuite"],
+      actions: ["Open Forecast Review", "Ask Follow-up"],
+    };
+  if (p.includes("accuracy") || p.includes("q3"))
+    return {
+      intro: "Q3 2026 forecast accuracy, from the published review FR-2026-005:",
+      table: [
+        ["Metric", "Forecast", "Actual"],
+        ["Q3 revenue", "$30.5M", "$30.6M"],
+        ["Q3 gross margin", "41.0%", "41.1%"],
+        ["Q3 EBITDA margin", "12.1%", "12.4%"],
+        ["Closing cash, Oct 31", "$17.9M", "$18.4M"],
+      ],
+      sections: [
+        {
+          title: "Takeaway",
+          items: [
+            "Every headline measure landed inside the 2% tolerance the forecast is managed to.",
+            "Freight costs have run light for two quarters; the Q4 forecast now uses the lower run rate explicitly instead of treating it as a surprise.",
+          ],
+        },
+      ],
+      confidence: "High",
+      agents: ["Financial Analysis Agent"],
+      sources: ["FR-2026-005", "NetSuite"],
+      actions: ["Ask Follow-up"],
+    };
+  if (p.includes("fy2027") || p.includes("budget") && p.includes("summar"))
+    return {
+      intro: "The FY2027 budget, currently in internal review as FR-2026-008:",
+      sections: [
+        {
+          title: "Headlines",
+          items: [
+            "Revenue $128.0M, up 5.1% on the FY2026 forecast of $121.8M.",
+            "Gross margin held at 41.2% and EBITDA of $16.1M at a 12.6% margin.",
+            "Operating expense ratio held at 28.6% of revenue.",
+          ],
+        },
+        {
+          title: "Assumptions to challenge",
+          items: [
+            "Volume growth is concentrated in Logistics; Manufacturing carries the steel price risk at 18% of revenue.",
+            "USD/CAD is budgeted at 1.36. The downside scenario at 1.42 with steel up 8% takes EBITDA to about $14.5M.",
+            "The budget goes to the board on Dec 10, 2026 after internal review and CFO sign-off, with the downside as an appendix.",
+          ],
+        },
+      ],
+      confidence: "Moderate, the budget is still in internal review",
+      agents: ["Forecasting Agent"],
+      sources: ["FR-2026-008", "FY2027 Budget Book"],
+      actions: ["Open Forecast Review", "Ask Follow-up"],
+    };
+  if (p.includes("entity") || p.includes("logistics") || p.includes("manufacturing") || p.includes("retail"))
+    return {
+      intro: "Performance by entity, Jan to Oct 2026:",
+      table: [
+        ["Entity", "Revenue", "Budget", "Gross margin"],
+        ["Manufacturing", "$58.4M", "$56.9M", "38.2%"],
+        ["Logistics", "$27.9M", "$26.8M", "44.0%"],
+        ["Retail", "$16.3M", "$15.7M", "47.2%"],
+      ],
+      sections: [
+        {
+          title: "Reading the table",
+          items: [
+            "All three entities are ahead of budget. Logistics has the largest percentage beat, +4.1%, on contract volume.",
+            "Retail has the strongest margins and the weakest data: its actuals are 11 days old while the QuickBooks connection is expired.",
+          ],
+        },
+      ],
+      confidence: "High for Manufacturing and Logistics; moderate for Retail until its data is current",
+      agents: ["Variance Analysis Agent"],
+      sources: ["NetSuite", "Spreadsheet uploads, Retail POS"],
+      actions: ["Ask Follow-up"],
+    };
+  return {
+    intro:
+      "Here is the year to date position against budget, and what needs attention before the Q4 forecast is approved.",
+    sections: [
+      {
+        title: "1. Performance against budget",
+        items: [
+          "Revenue $102.6M against a $99.4M budget, +3.2%.",
+          "Gross margin 41.2%, 0.4 points ahead of budget.",
+          "EBITDA $12.9M at a 12.6% margin, ahead of the 12.2% budget.",
+        ],
+      },
+      {
+        title: "2. What drove it",
+        items: [
+          "Logistics contract volume is the largest single driver, and it also drives the Q4 forecast increase.",
+          "Freight costs ran light through Q3, which flatters margin and is now built into the forecast explicitly.",
+          "October is the only month below budget, on Manufacturing shipments that slipped into November.",
+        ],
+      },
+      {
+        title: "3. What needs attention",
+        items: [
+          "FR-2026-011, the Q4 forecast update, is at Approval and needs a VP Finance or CFO decision.",
+          "Retail actuals are 11 days old because the QuickBooks connection has expired; the Retail forecast should be re-run once it is restored.",
+          "Steel is 18% of revenue in Manufacturing costs, so the FY2027 margin plan carries a single-input exposure that only the downside scenario shows.",
+        ],
+      },
+    ],
+    confidence: "High at group level; Retail entity level is limited by stale data",
+    limitations: [
+      "Retail actuals are 11 days old (QuickBooks authentication expired).",
+      "November expense actuals are estimated while the Concur sync is stale.",
+    ],
+    agents: ["Variance Analysis Agent", "Forecasting Agent"],
+    sources: ["NetSuite", "Salesforce", "TD Bank feed", "Chase Bank feed"],
+    actions: ["Open in Scenario Modeling", "Ask Follow-up"],
+  };
+}

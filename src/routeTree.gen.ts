@@ -16,9 +16,11 @@ import { Route as AutomationsRouteImport } from './routes/automations'
 import { Route as BillingRouteImport } from './routes/billing'
 import { Route as ChatsRouteImport } from './routes/chats'
 import { Route as CloseRouteImport } from './routes/close'
+import { Route as CostingRouteImport } from './routes/costing'
 import { Route as DataSourcesRouteImport } from './routes/data-sources'
 import { Route as DocumentsRouteImport } from './routes/documents'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as MigrationRouteImport } from './routes/migration'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PayablesRouteImport } from './routes/payables'
@@ -26,9 +28,11 @@ import { Route as PermissionsRouteImport } from './routes/permissions'
 import { Route as PlanningRouteImport } from './routes/planning'
 import { Route as PreferencesRouteImport } from './routes/preferences'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ReceivablesRouteImport } from './routes/receivables'
 import { Route as ReconciliationsRouteImport } from './routes/reconciliations'
 import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as RoyaltiesRouteImport } from './routes/royalties'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as TreasuryRouteImport } from './routes/treasury'
 import { Route as UsersRouteImport } from './routes/users'
@@ -85,6 +89,11 @@ const CloseRoute = CloseRouteImport.update({
   path: '/close',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CostingRoute = CostingRouteImport.update({
+  id: '/costing',
+  path: '/costing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DataSourcesRoute = DataSourcesRouteImport.update({
   id: '/data-sources',
   path: '/data-sources',
@@ -98,6 +107,11 @@ const DocumentsRoute = DocumentsRouteImport.update({
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InventoryRoute = InventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MigrationRoute = MigrationRouteImport.update({
@@ -135,6 +149,11 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsRoute = ProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReceivablesRoute = ReceivablesRouteImport.update({
   id: '/receivables',
   path: '/receivables',
@@ -148,6 +167,11 @@ const ReconciliationsRoute = ReconciliationsRouteImport.update({
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoyaltiesRoute = RoyaltiesRouteImport.update({
+  id: '/royalties',
+  path: '/royalties',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -259,9 +283,11 @@ export interface FileRoutesByFullPath {
   '/billing': typeof BillingRoute
   '/chats': typeof ChatsRoute
   '/close': typeof CloseRoute
+  '/costing': typeof CostingRoute
   '/data-sources': typeof DataSourcesRoute
   '/documents': typeof DocumentsRoute
   '/help': typeof HelpRoute
+  '/inventory': typeof InventoryRoute
   '/migration': typeof MigrationRoute
   '/onboarding': typeof OnboardingRoute
   '/payables': typeof PayablesRouteWithChildren
@@ -269,9 +295,11 @@ export interface FileRoutesByFullPath {
   '/planning': typeof PlanningRouteWithChildren
   '/preferences': typeof PreferencesRoute
   '/profile': typeof ProfileRoute
+  '/projects': typeof ProjectsRoute
   '/receivables': typeof ReceivablesRouteWithChildren
   '/reconciliations': typeof ReconciliationsRoute
   '/reports': typeof ReportsRoute
+  '/royalties': typeof RoyaltiesRoute
   '/settings': typeof SettingsRoute
   '/treasury': typeof TreasuryRoute
   '/users': typeof UsersRoute
@@ -299,16 +327,20 @@ export interface FileRoutesByTo {
   '/billing': typeof BillingRoute
   '/chats': typeof ChatsRoute
   '/close': typeof CloseRoute
+  '/costing': typeof CostingRoute
   '/data-sources': typeof DataSourcesRoute
   '/documents': typeof DocumentsRoute
   '/help': typeof HelpRoute
+  '/inventory': typeof InventoryRoute
   '/migration': typeof MigrationRoute
   '/onboarding': typeof OnboardingRoute
   '/permissions': typeof PermissionsRoute
   '/preferences': typeof PreferencesRoute
   '/profile': typeof ProfileRoute
+  '/projects': typeof ProjectsRoute
   '/reconciliations': typeof ReconciliationsRoute
   '/reports': typeof ReportsRoute
+  '/royalties': typeof RoyaltiesRoute
   '/settings': typeof SettingsRoute
   '/treasury': typeof TreasuryRoute
   '/users': typeof UsersRoute
@@ -338,9 +370,11 @@ export interface FileRoutesById {
   '/billing': typeof BillingRoute
   '/chats': typeof ChatsRoute
   '/close': typeof CloseRoute
+  '/costing': typeof CostingRoute
   '/data-sources': typeof DataSourcesRoute
   '/documents': typeof DocumentsRoute
   '/help': typeof HelpRoute
+  '/inventory': typeof InventoryRoute
   '/migration': typeof MigrationRoute
   '/onboarding': typeof OnboardingRoute
   '/payables': typeof PayablesRouteWithChildren
@@ -348,9 +382,11 @@ export interface FileRoutesById {
   '/planning': typeof PlanningRouteWithChildren
   '/preferences': typeof PreferencesRoute
   '/profile': typeof ProfileRoute
+  '/projects': typeof ProjectsRoute
   '/receivables': typeof ReceivablesRouteWithChildren
   '/reconciliations': typeof ReconciliationsRoute
   '/reports': typeof ReportsRoute
+  '/royalties': typeof RoyaltiesRoute
   '/settings': typeof SettingsRoute
   '/treasury': typeof TreasuryRoute
   '/users': typeof UsersRoute
@@ -382,9 +418,11 @@ export interface FileRouteTypes {
     | '/billing'
     | '/chats'
     | '/close'
+    | '/costing'
     | '/data-sources'
     | '/documents'
     | '/help'
+    | '/inventory'
     | '/migration'
     | '/onboarding'
     | '/payables'
@@ -392,9 +430,11 @@ export interface FileRouteTypes {
     | '/planning'
     | '/preferences'
     | '/profile'
+    | '/projects'
     | '/receivables'
     | '/reconciliations'
     | '/reports'
+    | '/royalties'
     | '/settings'
     | '/treasury'
     | '/users'
@@ -422,16 +462,20 @@ export interface FileRouteTypes {
     | '/billing'
     | '/chats'
     | '/close'
+    | '/costing'
     | '/data-sources'
     | '/documents'
     | '/help'
+    | '/inventory'
     | '/migration'
     | '/onboarding'
     | '/permissions'
     | '/preferences'
     | '/profile'
+    | '/projects'
     | '/reconciliations'
     | '/reports'
+    | '/royalties'
     | '/settings'
     | '/treasury'
     | '/users'
@@ -460,9 +504,11 @@ export interface FileRouteTypes {
     | '/billing'
     | '/chats'
     | '/close'
+    | '/costing'
     | '/data-sources'
     | '/documents'
     | '/help'
+    | '/inventory'
     | '/migration'
     | '/onboarding'
     | '/payables'
@@ -470,9 +516,11 @@ export interface FileRouteTypes {
     | '/planning'
     | '/preferences'
     | '/profile'
+    | '/projects'
     | '/receivables'
     | '/reconciliations'
     | '/reports'
+    | '/royalties'
     | '/settings'
     | '/treasury'
     | '/users'
@@ -503,9 +551,11 @@ export interface RootRouteChildren {
   BillingRoute: typeof BillingRoute
   ChatsRoute: typeof ChatsRoute
   CloseRoute: typeof CloseRoute
+  CostingRoute: typeof CostingRoute
   DataSourcesRoute: typeof DataSourcesRoute
   DocumentsRoute: typeof DocumentsRoute
   HelpRoute: typeof HelpRoute
+  InventoryRoute: typeof InventoryRoute
   MigrationRoute: typeof MigrationRoute
   OnboardingRoute: typeof OnboardingRoute
   PayablesRoute: typeof PayablesRouteWithChildren
@@ -513,9 +563,11 @@ export interface RootRouteChildren {
   PlanningRoute: typeof PlanningRouteWithChildren
   PreferencesRoute: typeof PreferencesRoute
   ProfileRoute: typeof ProfileRoute
+  ProjectsRoute: typeof ProjectsRoute
   ReceivablesRoute: typeof ReceivablesRouteWithChildren
   ReconciliationsRoute: typeof ReconciliationsRoute
   ReportsRoute: typeof ReportsRoute
+  RoyaltiesRoute: typeof RoyaltiesRoute
   SettingsRoute: typeof SettingsRoute
   TreasuryRoute: typeof TreasuryRoute
   UsersRoute: typeof UsersRoute
@@ -572,6 +624,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CloseRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/costing': {
+      id: '/costing'
+      path: '/costing'
+      fullPath: '/costing'
+      preLoaderRoute: typeof CostingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/data-sources': {
       id: '/data-sources'
       path: '/data-sources'
@@ -591,6 +650,13 @@ declare module '@tanstack/react-router' {
       path: '/help'
       fullPath: '/help'
       preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inventory': {
+      id: '/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof InventoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/migration': {
@@ -642,6 +708,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projects': {
+      id: '/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/receivables': {
       id: '/receivables'
       path: '/receivables'
@@ -661,6 +734,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/royalties': {
+      id: '/royalties'
+      path: '/royalties'
+      fullPath: '/royalties'
+      preLoaderRoute: typeof RoyaltiesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -907,9 +987,11 @@ const rootRouteChildren: RootRouteChildren = {
   BillingRoute: BillingRoute,
   ChatsRoute: ChatsRoute,
   CloseRoute: CloseRoute,
+  CostingRoute: CostingRoute,
   DataSourcesRoute: DataSourcesRoute,
   DocumentsRoute: DocumentsRoute,
   HelpRoute: HelpRoute,
+  InventoryRoute: InventoryRoute,
   MigrationRoute: MigrationRoute,
   OnboardingRoute: OnboardingRoute,
   PayablesRoute: PayablesRouteWithChildren,
@@ -917,9 +999,11 @@ const rootRouteChildren: RootRouteChildren = {
   PlanningRoute: PlanningRouteWithChildren,
   PreferencesRoute: PreferencesRoute,
   ProfileRoute: ProfileRoute,
+  ProjectsRoute: ProjectsRoute,
   ReceivablesRoute: ReceivablesRouteWithChildren,
   ReconciliationsRoute: ReconciliationsRoute,
   ReportsRoute: ReportsRoute,
+  RoyaltiesRoute: RoyaltiesRoute,
   SettingsRoute: SettingsRoute,
   TreasuryRoute: TreasuryRoute,
   UsersRoute: UsersRoute,

@@ -4,7 +4,11 @@ import { KeyRound, Mail, MapPin, MonitorSmartphone, ShieldCheck } from "lucide-r
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/alfie-ui";
 import { Button } from "@/components/ui/button";
-import { auditEvents } from "@/lib/admin-data";
+import { auditEvents, orgUsers } from "@/lib/admin-data";
+import { activeWorkspace } from "@/lib/workspace";
+
+const myEmail =
+  orgUsers.find((u) => u.name === activeWorkspace.userName)?.email ?? "";
 
 export const Route = createFileRoute("/profile")({ component: ProfilePage });
 
@@ -42,7 +46,7 @@ const initialSessions: Session[] = [
 function ProfilePage() {
   const [saved, setSaved] = useState(false);
   const [sessions, setSessions] = useState(initialSessions);
-  const myActivity = auditEvents.filter((e) => e.actor === "Elena Brooks").slice(0, 4);
+  const myActivity = auditEvents.filter((e) => e.actor === activeWorkspace.userName).slice(0, 4);
 
   return (
     <AppShell>
@@ -57,11 +61,11 @@ function ProfilePage() {
             <section className={card}>
               <div className="flex items-center gap-3">
                 <div className="flex size-12 items-center justify-center rounded-full bg-avatar text-base font-semibold text-avatar-foreground">
-                  EB
+                  {activeWorkspace.userInitials}
                 </div>
                 <div>
-                  <p className="text-base font-semibold">Elena Brooks</p>
-                  <p className="text-[13px] text-muted-foreground">VP Finance</p>
+                  <p className="text-base font-semibold">{activeWorkspace.userName}</p>
+                  <p className="text-[13px] text-muted-foreground">{activeWorkspace.userRole}</p>
                 </div>
               </div>
               <span className="mt-3 inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-[12px] font-semibold text-primary">
@@ -70,7 +74,7 @@ function ProfilePage() {
               <dl className="mt-4 space-y-2 text-[13px]">
                 <div className="flex items-center gap-2">
                   <Mail className="size-4 text-muted-foreground" />
-                  <span>elena.brooks@meridiangroup.com</span>
+                  <span>{myEmail}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="size-4 text-muted-foreground" />
@@ -114,15 +118,15 @@ function ProfilePage() {
               >
                 <label className="block">
                   <span className={labelCls}>Full name</span>
-                  <input className={`${inputCls} mt-1`} defaultValue="Elena Brooks" />
+                  <input className={`${inputCls} mt-1`} defaultValue={activeWorkspace.userName} />
                 </label>
                 <label className="block">
                   <span className={labelCls}>Job title</span>
-                  <input className={`${inputCls} mt-1`} defaultValue="VP Finance" />
+                  <input className={`${inputCls} mt-1`} defaultValue={activeWorkspace.userRole} />
                 </label>
                 <label className="block">
                   <span className={labelCls}>Work email</span>
-                  <input className={`${inputCls} mt-1`} defaultValue="elena.brooks@meridiangroup.com" />
+                  <input className={`${inputCls} mt-1`} defaultValue={myEmail} />
                 </label>
                 <label className="block">
                   <span className={labelCls}>Phone</span>

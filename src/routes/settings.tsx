@@ -16,7 +16,15 @@ import { PageHeader } from "@/components/alfie-ui";
 import { Button } from "@/components/ui/button";
 import { WorkspaceStatusBadge } from "@/components/workspace-badges";
 import { agents } from "@/lib/agents-data";
-import { auditEvents, platformServices, retentionPolicies } from "@/lib/admin-data";
+import {
+  alfieInstructions,
+  auditEvents,
+  openIncident,
+  orgProfile,
+  platformServices,
+  retentionPolicies,
+} from "@/lib/admin-data";
+import { activeWorkspace } from "@/lib/workspace";
 
 export const Route = createFileRoute("/settings")({ component: SettingsPage });
 
@@ -83,9 +91,7 @@ function SettingsPage() {
     Object.fromEntries(notificationEvents.map((e) => [e, true])),
   );
   const [auditType, setAuditType] = useState("All types");
-  const [instructions, setInstructions] = useState(
-    "Use Meridian Group terminology. Refer to the three entities by their full names. Escalate any journal entry unapproved for more than 2 business days to the Controller. Never present sample or stale data as current: name the source and its sync time.",
-  );
+  const [instructions, setInstructions] = useState(alfieInstructions);
 
   const auditFiltered = useMemo(
     () => auditEvents.filter((e) => auditType === "All types" || e.type === auditType),
@@ -116,26 +122,26 @@ function SettingsPage() {
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <label className="block text-[13px] text-muted-foreground">
                 Organization name
-                <input className={`${inputCls} mt-1`} defaultValue="Meridian Group" />
+                <input className={`${inputCls} mt-1`} defaultValue={orgProfile.name} />
               </label>
               <label className="block text-[13px] text-muted-foreground">
                 Legal entity name
                 <input
                   className={`${inputCls} mt-1`}
-                  defaultValue="Meridian Group Inc."
+                  defaultValue={orgProfile.legalName}
                 />
               </label>
               <label className="block text-[13px] text-muted-foreground">
                 Organization identifier
-                <input className={`${inputCls} mt-1`} defaultValue="MG-ORG-2026-001" />
+                <input className={`${inputCls} mt-1`} defaultValue={orgProfile.identifier} />
               </label>
               <label className="block text-[13px] text-muted-foreground">
                 Industry
-                <input className={`${inputCls} mt-1`} defaultValue="Manufacturing, logistics and retail" />
+                <input className={`${inputCls} mt-1`} defaultValue={orgProfile.industry} />
               </label>
               <label className="block text-[13px] text-muted-foreground">
                 Primary address
-                <input className={`${inputCls} mt-1`} defaultValue="480 King Street West, Toronto, ON" />
+                <input className={`${inputCls} mt-1`} defaultValue={orgProfile.address} />
               </label>
               <label className="block text-[13px] text-muted-foreground">
                 Country
@@ -148,12 +154,12 @@ function SettingsPage() {
                 Business contact email
                 <input
                   className={`${inputCls} mt-1`}
-                  defaultValue="finance@meridiangroup.com"
+                  defaultValue={orgProfile.email}
                 />
               </label>
               <label className="block text-[13px] text-muted-foreground">
                 Business contact phone
-                <input className={`${inputCls} mt-1`} defaultValue="+1 416 555 0100" />
+                <input className={`${inputCls} mt-1`} defaultValue={orgProfile.phone} />
               </label>
             </div>
             <p className="mt-2.5 text-[13px] leading-4 text-muted-foreground">
@@ -238,9 +244,10 @@ function SettingsPage() {
             <Bot className="size-4 text-primary" /> Alfie configuration
           </h2>
           <p className="mt-0.5 text-[13px] text-muted-foreground">
-            Organizational instructions for Alfie. These shape how Alfie works for Meridian Group
+            Organizational instructions for Alfie. These shape how Alfie works for{" "}
+            {activeWorkspace.companyShort}
             without changing the platform's foundational behavior. Changes are versioned and
-            auditable. Current version: 6 (updated Oct 15 by Elena Brooks).
+            auditable. Current version: 6 (updated Oct 15 by {activeWorkspace.userName}).
           </p>
           <label className="mt-3 block text-[13px] text-muted-foreground">
             Organization instructions
@@ -411,7 +418,7 @@ function SettingsPage() {
               </label>
               <label className="block text-[13px] text-muted-foreground">
                 Trusted domains
-                <input className={`${inputCls} mt-1`} defaultValue="meridiangroup.com" />
+                <input className={`${inputCls} mt-1`} defaultValue={orgProfile.domain} />
               </label>
             </div>
             <p className="mt-2.5 text-[13px] leading-4 text-muted-foreground">
@@ -445,7 +452,7 @@ function SettingsPage() {
               ))}
             </ul>
             <p className="mt-2 text-[13px] leading-4 text-muted-foreground">
-              Business data integrations, such as NetSuite or the bank feeds, are managed in{" "}
+              Business data integrations, such as {orgProfile.erpName} or the bank feeds, are managed in{" "}
               <Link to="/data-sources" className="font-medium text-primary underline">
                 Data Sources
               </Link>
@@ -550,9 +557,7 @@ function SettingsPage() {
               ))}
             </div>
             <p className="mt-3 rounded-xl bg-warning/10 p-3 text-[13px] leading-4">
-              Open incident: Concur expense synchronization has been stale for 3 days, and the
-              QuickBooks credential for Meridian Retail has expired. Owner: Elena Brooks. Alfie
-              marks data from these sources as stale wherever it would be used.
+              {openIncident}
             </p>
           </section>
         </div>

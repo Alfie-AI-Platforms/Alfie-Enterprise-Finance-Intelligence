@@ -46,6 +46,13 @@ import {
   scheduledReports,
   type LibraryReport,
 } from "@/lib/reports-data";
+import { activeWorkspace } from "@/lib/workspace";
+import {
+  reportAskReplies,
+  reportBuilderSources,
+  reportEntityFilterOptions,
+  reportInsights,
+} from "@/lib/workspace-data";
 
 export const Route = createFileRoute("/reports")({ component: ReportsPage });
 
@@ -54,58 +61,6 @@ const inputCls =
   "h-9 w-full rounded-lg border border-border bg-background px-2.5 text-xs outline-none focus:border-ring";
 const selectCls =
   "select-chevron h-9 rounded-lg border border-border bg-background pl-2.5 text-xs outline-none focus:border-ring";
-
-const askReplies: { match: string[]; agents: string; answer: string; sources: string }[] = [
-  {
-    match: ["gross margin", "margin"],
-    agents: "FP&A Analysis Agent",
-    answer:
-      "Gross margin is 41.2% year to date, 0.8 points behind the 42.0% plan. Manufacturing is the driver: steel and component costs absorbed most of the spring price increases. Logistics runs at 38.0% and Retail at 40.5%. These figures come from NetSuite, refreshed 12 minutes ago.",
-    sources: "NetSuite · RPT-307 Consolidated Financial Performance",
-  },
-  {
-    match: ["revenue", "budget"],
-    agents: "FP&A Analysis Agent",
-    answer:
-      "Revenue is $102.6M year to date against a $99.4M budget, 3.2% ahead. October contributed $9.8M. Manufacturing is the largest entity at $58.4M, then Logistics at $27.9M and Retail at $16.3M. Retail figures are labelled preliminary while its QuickBooks migration completes.",
-    sources: "NetSuite · RPT-307 · RPT-306 (Retail, preliminary)",
-  },
-  {
-    match: ["cash", "liquidity"],
-    agents: "Treasury Agent",
-    answer:
-      "Cash is $18.4M CAD equivalent across 6 bank accounts, 4 at TD and 2 at Chase for the USD entity. The 13 week forecast low point is $11.2M in week 9. Operating cash flow is $10.4M year to date, behind EBITDA of $12.9M because receivables have built up.",
-    sources: "TD and Chase bank feeds · Treasury workspace",
-  },
-  {
-    match: ["close", "closing"],
-    agents: "Close Agent",
-    answer:
-      "October closed in 6 days against the 8 day target, the third consecutive improvement. November is under way with 18 of 64 tasks complete; subledger cutoffs start Nov 28. One post-close adjustment from October is still open: JE-2026-1087, the $18,400 intercompany correction, waiting on CFO approval.",
-    sources: "Close workspace · RPT-311 Close Performance Report",
-  },
-  {
-    match: ["dso", "dpo", "working capital", "receivables"],
-    agents: "Reconciliation Agent, FP&A Analysis Agent",
-    answer:
-      "DSO is 38 days and DPO is 44 days, giving a cash conversion cycle of 41 days with inventory at 47 days. The pressure is in receivables: $842K is over 60 days, and Northern Build Supplies alone carries $214,300 open with its largest invoice 62 days old.",
-    sources: "NetSuite · RPT-308 Working Capital and Cash Conversion Review",
-  },
-  {
-    match: ["covenant", "lender", "loan", "leverage"],
-    agents: "Treasury Agent",
-    answer:
-      "Leverage is 2.1x against a covenant maximum of 3.0x on the $12.0M term loan, so headroom is 0.9x at current EBITDA. The Q3 compliance certificate was delivered Nov 5 and the next test date is December 31, 2026.",
-    sources: "Loan agreement DOC-1038 · RPT-302 Lender Compliance Package",
-  },
-  {
-    match: ["executive", "summarize", "summary", "performance"],
-    agents: "Close, Reconciliation, FP&A and Treasury Agents",
-    answer:
-      "Executive summary: revenue is ahead of budget at $102.6M and the October close landed in 6 days. Two items need management attention: gross margin is 0.8 points behind plan at 41.2% on Manufacturing input costs, and $842K of receivables is over 60 days. One post-close adjustment, JE-2026-1087 for $18,400, is waiting on CFO approval. Every figure here traces to a library report listed below.",
-    sources: "RPT-301 November Board Pack · RPT-307 · RPT-308 · RPT-310",
-  },
-];
 
 function ReportsPage() {
   const [period, setPeriod] = useState("This quarter");
@@ -121,7 +76,7 @@ function ReportsPage() {
   const [bCategory, setBCategory] = useState("Finance");
   const [bPeriod, setBPeriod] = useState("Last 12 months");
   const [bComparison, setBComparison] = useState("Prior period");
-  const [bSources, setBSources] = useState<string[]>(["NetSuite"]);
+  const [bSources, setBSources] = useState<string[]>([reportBuilderSources[0]!]);
   const [bMetrics, setBMetrics] = useState<string[]>(["Revenue", "Gross margin"]);
   const [generated, setGenerated] = useState<string | null>(null);
   const [savedNote, setSavedNote] = useState<string | null>(null);
@@ -142,7 +97,7 @@ function ReportsPage() {
 
   function ask() {
     const q = question.toLowerCase();
-    const found = askReplies.find((r) => r.match.some((m) => q.includes(m)));
+    const found = reportAskReplies.find((r) => r.match.some((m) => q.includes(m)));
     setAnswer(
       found ?? {
         agents: "Alfie, coordinating the relevant agents",
@@ -171,7 +126,7 @@ function ReportsPage() {
       category: bCategory,
       description: generated ?? "",
       period: bPeriod,
-      owner: "Elena Brooks",
+      owner: activeWorkspace.userName,
       created: "Nov 16, 2026",
       updated: "Nov 16, 2026",
       access: "Creator's departments",
@@ -289,23 +244,13 @@ function ReportsPage() {
               </ResponsiveContainer>
             </div>
             <div className="mt-3 grid gap-2.5 md:grid-cols-3">
-              {[
-                [
-                  "Growth vs margin",
-                  "Revenue is 3.2% ahead of budget while gross margin is 0.8 points behind plan. Growth and profitability are moving in opposite directions because Manufacturing input costs absorbed the spring price increases. Volume growth in the same period is not proof of margin health.",
-                ],
-                [
-                  "Working capital",
-                  "The cash conversion cycle is 41 days and receivables are the lever: DSO is 38 days with $842K over 60 days. Payables at 44 days sit inside agreed supplier terms, so the fix is on the collections side, not in stretching vendors.",
-                ],
-                [
-                  "Retail figures, flagged",
-                  "Meridian Retail still reports from QuickBooks while its migration completes, so Retail figures in consolidated reports are flagged as preliminary in RPT-306 rather than published as final. The trial balance difference of $1,240 is disclosed, not adjusted away.",
-                ],
-              ].map(([t, d]) => (
-                <div key={t} className="rounded-xl bg-secondary/50 p-3 text-xs leading-5">
-                  <p className="font-semibold">{t}</p>
-                  <p className="mt-1 text-muted-foreground">{d}</p>
+              {reportInsights.map((insight) => (
+                <div
+                  key={insight.title}
+                  className="rounded-xl bg-secondary/50 p-3 text-xs leading-5"
+                >
+                  <p className="font-semibold">{insight.title}</p>
+                  <p className="mt-1 text-muted-foreground">{insight.description}</p>
                 </div>
               ))}
             </div>
@@ -556,9 +501,9 @@ function ReportsPage() {
                   defaultValue="All entities, all currencies"
                 >
                   <option>All entities, all currencies</option>
-                  <option>Manufacturing only</option>
-                  <option>Logistics only (USD)</option>
-                  <option>Retail only</option>
+                  {reportEntityFilterOptions.map((o) => (
+                    <option key={o}>{o}</option>
+                  ))}
                 </select>
               </label>
             </div>
@@ -567,13 +512,7 @@ function ReportsPage() {
                 Data sources (only ones your role can use)
               </p>
               <div className="mt-1.5 flex flex-wrap gap-1.5">
-                {[
-                  "NetSuite",
-                  "TD Bank Feed",
-                  "Chase Bank Feed",
-                  "Salesforce",
-                  "Spreadsheet Uploads",
-                ].map((s) => (
+                {reportBuilderSources.map((s) => (
                   <button
                     key={s}
                     type="button"

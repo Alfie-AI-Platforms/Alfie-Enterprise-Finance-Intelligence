@@ -7,7 +7,12 @@ import { Button } from "@/components/ui/button";
 import {
   alfieRecNotes,
   recAccounts,
+  recCorrectionLink,
+  recDescription,
   recExceptions,
+  recFlagshipPrompt,
+  recMetaDescription,
+  recRunNote,
   recSummary,
   type RecAccountStatus,
 } from "@/lib/reconciliations-data";
@@ -19,7 +24,7 @@ export const Route = createFileRoute("/reconciliations")({
       {
         name: "description",
         content:
-          "Bank, subledger and control account reconciliations for Meridian Group, with continuous auto-matching and one exceptions queue.",
+          recMetaDescription,
       },
       { property: "og:title", content: "Reconciliations | Alfie Enterprise Finance" },
       { property: "og:type", content: "website" },
@@ -75,16 +80,9 @@ function ReconciliationsPage() {
       <div className="mx-auto max-w-7xl px-5 pb-12 pt-8 lg:px-10">
         <PageHeader
           title="Reconciliations"
-          description="Every bank, card, subledger and control account for Meridian Group, matched continuously by Alfie, with one exceptions queue for the lines a person needs to look at."
+          description={recDescription}
           actions={
-            <Button
-              variant="outline"
-              onClick={() =>
-                setRunNote(
-                  "Matching run completed just now. No new exceptions; the six open exceptions below are unchanged.",
-                )
-              }
-            >
+            <Button variant="outline" onClick={() => setRunNote(recRunNote)}>
               <RefreshCw className="size-4" />
               Run matching
             </Button>
@@ -128,14 +126,8 @@ function ReconciliationsPage() {
             ))}
           </ul>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                open("Explain the payroll clearing difference of $3,215 and whether it needs a journal entry.")
-              }
-            >
-              Explain the payroll clearing difference
+            <Button variant="outline" size="sm" onClick={() => open(recFlagshipPrompt.prompt)}>
+              {recFlagshipPrompt.label}
             </Button>
             <Button variant="outline" size="sm" asChild>
               <Link to="/close">Open the November close</Link>
@@ -229,10 +221,10 @@ function ReconciliationsPage() {
                   {e.id} · {e.account} · {e.amount} · Open {e.age} · Owner {e.owner}
                 </p>
                 <p className="mt-2 text-[13px] leading-5 text-muted-foreground">{e.detail}</p>
-                {e.id === "EX-03" ? (
+                {recCorrectionLink && e.id === recCorrectionLink.exceptionId ? (
                   <Button asChild size="sm" variant="outline" className="mt-3">
-                    <Link to="/accounting/$entryId" params={{ entryId: "JE-2026-1087" }}>
-                      Open JE-2026-1087
+                    <Link to="/accounting/$entryId" params={{ entryId: recCorrectionLink.entryId }}>
+                      Open {recCorrectionLink.entryId}
                     </Link>
                   </Button>
                 ) : null}

@@ -35,6 +35,7 @@ import {
   orgDocuments,
   type OrgDocument,
 } from "@/lib/workspace-data";
+import { activeWorkspace } from "@/lib/workspace";
 
 export const Route = createFileRoute("/documents")({ component: DocumentsPage });
 
@@ -170,7 +171,7 @@ function DocumentsPage() {
       type: suggestion.type,
       category: suggestion.category,
       department: "Finance",
-      owner: "Elena Brooks",
+      owner: activeWorkspace.userName,
       uploaded: "Nov 04, 2026",
       modified: "Nov 04, 2026",
       version: "1.0",
@@ -292,7 +293,7 @@ function DocumentsPage() {
                 <p>Category: {suggestion.category}</p>
                 <p>Classification: {suggestion.classification}</p>
                 <p className="mt-1 text-muted-foreground">
-                  Entities found: Meridian Group, entity and account references. You can correct
+                  Entities found: {activeWorkspace.companyShort}, entity and account references. You can correct
                   any of this before storing.
                 </p>
               </div>

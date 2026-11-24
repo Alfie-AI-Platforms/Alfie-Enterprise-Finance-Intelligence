@@ -11,12 +11,16 @@ import {
   canPublish,
   forecastAccuracy,
   forecastReviews,
+  planningApprovalImpact,
+  planningDataSources,
   planningExceptions,
+  planningReviewDefaults,
   planningRoles,
   reviewStages,
   type ForecastReview,
   type PlanningRole,
 } from "@/lib/planning-data";
+import { activeWorkspace } from "@/lib/workspace";
 
 export const Route = createFileRoute("/planning/reviews")({
   head: () => ({ meta: [{ title: "Forecast Reviews | Alfie Enterprise Finance" }] }),
@@ -26,7 +30,9 @@ export const Route = createFileRoute("/planning/reviews")({
 function ReviewsPage() {
   const [role, setRole] = useState<PlanningRole>("VP Finance");
   const [reviews, setReviews] = useState<ForecastReview[]>(forecastReviews);
-  const [selectedId, setSelectedId] = useState("FR-2026-011");
+  const [selectedId, setSelectedId] = useState(
+    () => forecastReviews.find((r) => r.status === "Pending Approval")?.id ?? forecastReviews[0]!.id,
+  );
   const [statusFilter, setStatusFilter] = useState("All statuses");
   const [comment, setComment] = useState("");
   const [actionNote, setActionNote] = useState<string | null>(null);
@@ -45,7 +51,7 @@ function ReviewsPage() {
       prev.map((r) => (r.id === selected.id ? { ...r, stage: 6, status: "Approved" as const } : r)),
     );
     setActionNote(
-      `${selected.id} approved by ${role} and moved to CFO Sign-off. Approval is not publication: the forecast changes in NetSuite only after CFO sign-off is recorded and the review is published.`,
+      `${selected.id} approved by ${role} and moved to CFO Sign-off. Approval is not publication: the forecast changes in ${planningDataSources[0]!.name} only after CFO sign-off is recorded and the review is published.`,
     );
   }
   function publish() {
@@ -65,7 +71,7 @@ function ReviewsPage() {
               ...r,
               comments: [
                 ...r.comments,
-                { who: `Elena Brooks, ${role}`, when: "Nov 16", text: comment.trim() },
+                { who: `${activeWorkspace.userName}, ${role}`, when: "Nov 16", text: comment.trim() },
               ],
             }
           : r,
@@ -78,14 +84,14 @@ function ReviewsPage() {
     const review: ForecastReview = {
       id,
       title: `${segment} forecast review, from exception ${excId}`,
-      scope: "Group, all entities",
+      scope: planningReviewDefaults.groupScope,
       current: "See Planning Analysis",
       proposedChangePct: 0,
       changeSummary: "To be assessed",
       impactSummary: `Initiated from planning exception ${excId} (${metric}). The originating exception, its metric, threshold and period are linked as evidence.`,
       stage: 0,
       status: "Draft",
-      owner: "Grace Liu",
+      owner: planningReviewDefaults.owner,
       comments: [
         {
           who: "Alfie",
@@ -227,7 +233,7 @@ function ReviewsPage() {
             <p className="mt-1.5 text-[13px] leading-5 text-muted-foreground">
               {selected.impactSummary}
             </p>
-            {selected.id === "FR-2026-011" ? (
+            {selected.id === planningApprovalImpact.reviewId ? (
               <table className="mt-2 w-full text-left text-xs">
                 <thead>
                   <tr className="border-b border-border text-muted-foreground">
@@ -237,21 +243,20 @@ function ReviewsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-border/60">
-                    <td className="py-1.5 pr-2">Q4 revenue forecast</td>
-                    <td className="py-1.5 pr-2">$28.5M</td>
-                    <td className="py-1.5">$29.0M</td>
-                  </tr>
-                  <tr className="border-b border-border/60">
-                    <td className="py-1.5 pr-2">FY2026 forecast revenue</td>
-                    <td className="py-1.5 pr-2">$121.3M</td>
-                    <td className="py-1.5">$121.8M</td>
-                  </tr>
-                  <tr>
-                    <td className="py-1.5 pr-2">Gross margin, base case</td>
-                    <td className="py-1.5 pr-2">41.2%</td>
-                    <td className="py-1.5">41.2% (downside 39.8%)</td>
-                  </tr>
+                  {planningApprovalImpact.rows.map(([metric, before, proposed], i) => (
+                    <tr
+                      key={metric}
+                      className={
+                        i < planningApprovalImpact.rows.length - 1
+                          ? "border-b border-border/60"
+                          : undefined
+                      }
+                    >
+                      <td className="py-1.5 pr-2">{metric}</td>
+                      <td className="py-1.5 pr-2">{before}</td>
+                      <td className="py-1.5">{proposed}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             ) : null}
@@ -291,7 +296,7 @@ function ReviewsPage() {
           </section>
 
           <div className="space-y-4">
-            {selected.id === "FR-2026-008" ? (
+            {selected.id === boardRecord.review ? (
               <section className={`${card} p-5`}>
                 <h2 className="text-sm font-semibold">Board submission</h2>
                 <div className="mt-2.5 grid grid-cols-2 gap-2 text-xs">
@@ -314,7 +319,7 @@ function ReviewsPage() {
                 </p>
               </section>
             ) : null}
-            {selected.id === "FR-2026-005" ? (
+            {selected.id === forecastAccuracy.review ? (
               <section className={`${card} p-5`}>
                 <h2 className="text-sm font-semibold">Forecast accuracy monitoring</h2>
                 <p className="mt-1 text-[13px] text-muted-foreground">{forecastAccuracy.published}.</p>
@@ -362,7 +367,7 @@ function ReviewsPage() {
                 <input
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="Add a comment as Elena Brooks"
+                  placeholder={`Add a comment as ${activeWorkspace.userName}`}
                   className="h-9 min-w-0 flex-1 rounded-lg border border-border bg-background px-2.5 text-xs outline-none focus:border-ring"
                 />
                 <Button size="sm" variant="outline" onClick={addComment}>

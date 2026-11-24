@@ -195,3 +195,8 @@ export const closeRoles = [
     desc: "Manages user access, permissions, integrations and agent configurations. Has no approval rights over accounting records.",
   },
 ] as const;
+
+// Route content for the Close page header. World-specific narrative lives
+// here so the route stays world-agnostic.
+export const closeDescription =
+  "Month end close for Meridian Group, managed as a controlled process with owners, due dates, approvals and reconciliation status across all three entities.";

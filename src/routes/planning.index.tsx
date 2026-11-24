@@ -20,7 +20,8 @@ import { AlfieMark } from "@/components/alfie-ui";
 import { Button } from "@/components/ui/button";
 import { AlfieComposer, type Attachment } from "@/components/alfie-composer";
 import { PlanningHeader, SampleDataNote, card } from "@/components/planning-nav";
-import { entities, kpis, monthlyRevenue } from "@/lib/planning-data";
+import { entities, kpis, monthlyRevenue, planningOverview, planningPrompts } from "@/lib/planning-data";
+import { activeWorkspace } from "@/lib/workspace";
 
 export const Route = createFileRoute("/planning/")({
   head: () => ({
@@ -28,8 +29,7 @@ export const Route = createFileRoute("/planning/")({
       { title: "Planning & FP&A | Alfie Enterprise Finance" },
       {
         name: "description",
-        content:
-          "Budget versus actual, forecasts, scenarios and forecast reviews for Meridian Group, with Alfie.",
+        content: `Budget versus actual, forecasts, scenarios and forecast reviews for ${activeWorkspace.companyShort}, with Alfie.`,
       },
       { property: "og:title", content: "Planning & FP&A | Alfie Enterprise Finance" },
       { property: "og:description", content: "AI powered planning and FP&A workspace for the CFO office." },
@@ -40,16 +40,7 @@ export const Route = createFileRoute("/planning/")({
   component: PlanningOverview,
 });
 
-const prompts = [
-  "Explain our revenue variance against budget year to date.",
-  "Why was October the only month below budget?",
-  "What is driving our gross margin against budget?",
-  "Walk me through the Q4 forecast review FR-2026-011.",
-  "What happens to FY2027 EBITDA if steel prices rise 8%?",
-  "Compare forecast accuracy for Q3 against the published forecast.",
-  "Summarize the FY2027 budget and its main assumptions.",
-  "Which entity is furthest ahead of budget, and why?",
-];
+const prompts = planningPrompts;
 const tip = {
   contentStyle: {
     background: "var(--popover)",
@@ -91,7 +82,7 @@ function PlanningOverview() {
       <div className="mx-auto max-w-7xl px-5 pb-12 pt-8 lg:px-10">
         <PlanningHeader
           title="Planning & FP&A"
-          subtitle="Budget versus actual, the rolling forecast, scenarios and the FY2027 budget for Meridian Group, prepared and explained with Alfie."
+          subtitle={`Budget versus actual, the rolling forecast, scenarios and the FY2027 budget for ${activeWorkspace.companyShort}, prepared and explained with Alfie.`}
           actions={
             <>
               <Button variant="outline" onClick={() => navigate({ to: "/planning/analysis" })}>
@@ -215,7 +206,8 @@ function PlanningOverview() {
               <div>
                 <h3 className="text-sm font-semibold">Margin trend</h3>
                 <p className="text-[13px] text-muted-foreground">
-                  Gross margin and EBITDA margin by month, budget gross margin 40.8%
+                  Gross margin and EBITDA margin by month, budget gross margin{" "}
+                  {planningOverview.budgetGrossMargin}%
                 </p>
               </div>
             </div>
@@ -227,7 +219,7 @@ function PlanningOverview() {
                   <YAxis {...axis} width={34} domain={["dataMin - 4", "dataMax + 4"]} unit="%" />
                   <Tooltip {...tip} />
                   <ReferenceLine
-                    y={40.8}
+                    y={planningOverview.budgetGrossMargin}
                     stroke="var(--muted-foreground)"
                     strokeDasharray="4 4"
                     label={{
@@ -314,7 +306,7 @@ function PlanningOverview() {
             <div>
               <h3 className="text-sm font-semibold">Revenue variance by entity</h3>
               <p className="text-[13px] text-muted-foreground">
-                YTD actual less budget, $M. Group variance is +$3.2M.
+                YTD actual less budget, $M. {planningOverview.groupVarianceNote}
               </p>
             </div>
             <div className="mt-3 h-56">
@@ -332,8 +324,7 @@ function PlanningOverview() {
               </ResponsiveContainer>
             </div>
             <p className="mt-1 text-[13px] text-muted-foreground">
-              All three entities are ahead of budget. Logistics has the largest percentage beat, on
-              contract volume that also drives the Q4 forecast review.
+              {planningOverview.entityNote}
             </p>
           </section>
         </div>

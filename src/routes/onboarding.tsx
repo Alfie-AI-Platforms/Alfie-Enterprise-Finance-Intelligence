@@ -6,8 +6,10 @@ import { PageHeader } from "@/components/alfie-ui";
 import {
   implementationTeam,
   onboardingGroups,
+  onboardingSummary,
   onboardingTimeline,
 } from "@/lib/onboarding-data";
+import { activeWorkspace } from "@/lib/workspace";
 
 export const Route = createFileRoute("/onboarding")({ component: OnboardingPage });
 
@@ -38,7 +40,7 @@ function OnboardingPage() {
           description="Everything between kickoff and go-live for this workspace: setup, data and migration, people and access, Alfie configuration, and the sign-off. Work through it with the implementation team; each item links to the module where it is finished."
         />
         <p className="mt-3 rounded-xl bg-secondary/60 px-4 py-2.5 text-[13px] leading-5 text-muted-foreground">
-          Sample progress for Meridian's onboarding. Checking an item updates this page in your
+          Sample progress for {activeWorkspace.companyShort}'s onboarding. Checking an item updates this page in your
           browser; the underlying work (connections, migrations, invitations) happens in the
           linked modules and the backend.
         </p>
@@ -53,8 +55,7 @@ function OnboardingPage() {
                 {doneCount} of {totalCount} steps complete
               </p>
               <p className="mt-1 text-[13px] text-muted-foreground">
-                Pilot group is live in Accounting. Remaining: Concur sync health, Retail migration
-                validation, agent activation, training and sign-off. Go-live target Jan 15, 2027.
+                {onboardingSummary}
               </p>
             </div>
             <p className="text-3xl font-semibold tabular-nums">{pct}%</p>

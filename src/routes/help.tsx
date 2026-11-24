@@ -4,6 +4,7 @@ import { LifeBuoy, Search } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/alfie-ui";
 import { Button } from "@/components/ui/button";
+import { helpServices } from "@/lib/workspace-data";
 
 export const Route = createFileRoute("/help")({ component: HelpPage });
 
@@ -61,12 +62,7 @@ const topics: { title: string; blurb: string; articles: string[] }[] = [
   },
 ];
 
-const services: { name: string; status: string; tone: string }[] = [
-  { name: "Alfie workspace", status: "Operational", tone: "text-positive" },
-  { name: "Document processing", status: "Operational", tone: "text-positive" },
-  { name: "Report generation", status: "Operational", tone: "text-positive" },
-  { name: "Concur expense connector", status: "Degraded, sync delayed", tone: "text-warning" },
-];
+const services = helpServices;
 
 const whatsNew: string[] = [
   "Billing now lives under Administration, with invoices you can read in place.",

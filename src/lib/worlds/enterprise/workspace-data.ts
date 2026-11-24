@@ -1018,3 +1018,182 @@ export const submissionWorkflowSteps = [
     detail: "Runs only after approval, and writes back to the bill record in NetSuite",
   },
 ];
+
+// ---------------------------------------------------------------------------
+// Route-level workspace content: canned chat replies (chats.tsx), report
+// insights and ask replies (reports.tsx), agent overview details
+// (agents.$agentId.index.tsx). Generic UI copy stays in the routes; anything
+// quoting this workspace's figures, records or systems lives here.
+// ---------------------------------------------------------------------------
+
+export type ChatSeedReply = {
+  retrieved: string;
+  analysis: string;
+  recommendation: string;
+};
+
+export const chatSeedCloseReply: ChatSeedReply = {
+  retrieved:
+    "Close checklist status from the Close workspace, synced 9 minutes ago. 18 of 64 tasks are complete and subledger cutoffs start Nov 28.",
+  analysis:
+    "Three items need attention this week: JE-2026-1087 is waiting on CFO approval, the payroll clearing exception of $3,215 is unreconciled, and Concur expenses have not synced for 3 days, so November expense accruals are estimated.",
+  recommendation:
+    "Start with JE-2026-1087. It is the only item blocked on an executive decision, and it holds the intercompany sign-off for the group.",
+};
+
+export type ChatBoardPackReply = { analysis: string; sources: string[] };
+
+export const chatBoardPackReply: ChatBoardPackReply = {
+  analysis:
+    "Revenue is tracking 3.2% ahead of budget year to date while gross margin is 0.8 points behind plan, and cash is $18.4M. The full breakdown is in the draft, separated into what was retrieved, what I analyzed, and what I recommend.",
+  sources: ["NetSuite", "TD and Chase bank feeds", "Planning workspace"],
+};
+
+export type ChatRetrievedReply = { retrieved: string; sources: string[] };
+
+export const chatJournalReply: ChatRetrievedReply = {
+  retrieved:
+    "Journal entries and account balances from NetSuite, synced 12 minutes ago, limited to the entries your role can access.",
+  sources: ["NetSuite", "Documents: Accounting Policies Manual"],
+};
+
+export const chatBillReply: ChatRetrievedReply = {
+  retrieved:
+    "Vendor bills, purchase orders and receiving records from NetSuite, with expense detail from Concur where it is current.",
+  sources: ["NetSuite", "Documents: Accounting Policies Manual, section 6.2"],
+};
+
+export const chatReceivableReply: ChatRetrievedReply = {
+  retrieved: "Customer balances and aging from NetSuite and Salesforce, which are current.",
+  sources: ["NetSuite", "Salesforce"],
+};
+
+export type ChatPlanningReply = { analysis: string; sources: string[] };
+
+export const chatPlanningReply: ChatPlanningReply = {
+  analysis:
+    "The movement is concentrated in Manufacturing input costs, not volume. I have separated the data I retrieved from the interpretation, and the underlying figures are available in Planning & FP&A.",
+  sources: ["Planning workspace", "NetSuite"],
+};
+
+export type ChatCashReply = { retrieved: string; analysis: string; sources: string[] };
+
+export const chatCashReply: ChatCashReply = {
+  retrieved:
+    "Financial figures from NetSuite, synced 12 minutes ago. These are the same figures shown in Reports.",
+  analysis:
+    "Cash is $18.4M across 6 accounts and the leverage covenant sits at 2.1x against a 3.0x maximum, while receivables over 60 days need attention. Sample figures in this workspace are illustrative until your systems are connected.",
+  sources: ["NetSuite", "Treasury workspace"],
+};
+
+export type ReportAskReply = {
+  match: string[];
+  agents: string;
+  answer: string;
+  sources: string;
+};
+
+export const reportAskReplies: ReportAskReply[] = [
+  {
+    match: ["gross margin", "margin"],
+    agents: "FP&A Analysis Agent",
+    answer:
+      "Gross margin is 41.2% year to date, 0.8 points behind the 42.0% plan. Manufacturing is the driver: steel and component costs absorbed most of the spring price increases. Logistics runs at 38.0% and Retail at 40.5%. These figures come from NetSuite, refreshed 12 minutes ago.",
+    sources: "NetSuite · RPT-307 Consolidated Financial Performance",
+  },
+  {
+    match: ["revenue", "budget"],
+    agents: "FP&A Analysis Agent",
+    answer:
+      "Revenue is $102.6M year to date against a $99.4M budget, 3.2% ahead. October contributed $9.8M. Manufacturing is the largest entity at $58.4M, then Logistics at $27.9M and Retail at $16.3M. Retail figures are labelled preliminary while its QuickBooks migration completes.",
+    sources: "NetSuite · RPT-307 · RPT-306 (Retail, preliminary)",
+  },
+  {
+    match: ["cash", "liquidity"],
+    agents: "Treasury Agent",
+    answer:
+      "Cash is $18.4M CAD equivalent across 6 bank accounts, 4 at TD and 2 at Chase for the USD entity. The 13 week forecast low point is $11.2M in week 9. Operating cash flow is $10.4M year to date, behind EBITDA of $12.9M because receivables have built up.",
+    sources: "TD and Chase bank feeds · Treasury workspace",
+  },
+  {
+    match: ["close", "closing"],
+    agents: "Close Agent",
+    answer:
+      "October closed in 6 days against the 8 day target, the third consecutive improvement. November is under way with 18 of 64 tasks complete; subledger cutoffs start Nov 28. One post-close adjustment from October is still open: JE-2026-1087, the $18,400 intercompany correction, waiting on CFO approval.",
+    sources: "Close workspace · RPT-311 Close Performance Report",
+  },
+  {
+    match: ["dso", "dpo", "working capital", "receivables"],
+    agents: "Reconciliation Agent, FP&A Analysis Agent",
+    answer:
+      "DSO is 38 days and DPO is 44 days, giving a cash conversion cycle of 41 days with inventory at 47 days. The pressure is in receivables: $842K is over 60 days, and Northern Build Supplies alone carries $214,300 open with its largest invoice 62 days old.",
+    sources: "NetSuite · RPT-308 Working Capital and Cash Conversion Review",
+  },
+  {
+    match: ["covenant", "lender", "loan", "leverage"],
+    agents: "Treasury Agent",
+    answer:
+      "Leverage is 2.1x against a covenant maximum of 3.0x on the $12.0M term loan, so headroom is 0.9x at current EBITDA. The Q3 compliance certificate was delivered Nov 5 and the next test date is December 31, 2026.",
+    sources: "Loan agreement DOC-1038 · RPT-302 Lender Compliance Package",
+  },
+  {
+    match: ["executive", "summarize", "summary", "performance"],
+    agents: "Close, Reconciliation, FP&A and Treasury Agents",
+    answer:
+      "Executive summary: revenue is ahead of budget at $102.6M and the October close landed in 6 days. Two items need management attention: gross margin is 0.8 points behind plan at 41.2% on Manufacturing input costs, and $842K of receivables is over 60 days. One post-close adjustment, JE-2026-1087 for $18,400, is waiting on CFO approval. Every figure here traces to a library report listed below.",
+    sources: "RPT-301 November Board Pack · RPT-307 · RPT-308 · RPT-310",
+  },
+];
+
+export type ReportInsight = { title: string; description: string };
+
+export const reportInsights: ReportInsight[] = [
+  {
+    title: "Growth vs margin",
+    description:
+      "Revenue is 3.2% ahead of budget while gross margin is 0.8 points behind plan. Growth and profitability are moving in opposite directions because Manufacturing input costs absorbed the spring price increases. Volume growth in the same period is not proof of margin health.",
+  },
+  {
+    title: "Working capital",
+    description:
+      "The cash conversion cycle is 41 days and receivables are the lever: DSO is 38 days with $842K over 60 days. Payables at 44 days sit inside agreed supplier terms, so the fix is on the collections side, not in stretching vendors.",
+  },
+  {
+    title: "Legacy figures, flagged",
+    description:
+      "One entity still reports from its legacy system while its migration completes, so its figures in consolidated reports are flagged as preliminary rather than published as final. Trial balance differences are disclosed, not adjusted away.",
+  },
+];
+
+export const reportEntityFilterOptions: string[] = [
+  "Manufacturing only",
+  "Logistics only (USD)",
+  "Retail only",
+];
+
+export const reportBuilderSources: string[] = [
+  "NetSuite",
+  "TD Bank Feed",
+  "Chase Bank Feed",
+  "Salesforce",
+  "Spreadsheet Uploads",
+];
+
+export const agentConnectedSystems =
+  "NetSuite · TD and Chase Bank Feeds · Salesforce · Document Repository";
+
+export const agentRecentRuns: [string, string, string][] = [
+  ["REC-1042", "Exception isolated", "12 min ago"],
+  ["JE-2026-1087", "Approval package prepared", "31 min ago"],
+  ["BILL-2214", "Three-way match completed", "1 hr ago"],
+];
+
+// ---------- Help page system status ----------
+export type HelpService = { name: string; status: string; tone: string };
+
+export const helpServices: HelpService[] = [
+  { name: "Alfie workspace", status: "Operational", tone: "text-positive" },
+  { name: "Document processing", status: "Operational", tone: "text-positive" },
+  { name: "Report generation", status: "Operational", tone: "text-positive" },
+  { name: "Concur expense connector", status: "Degraded, sync delayed", tone: "text-warning" },
+];

@@ -5,5 +5,5 @@ import * as mining from "./worlds/mining/close-data";
 
 const active = activeWorkspaceId === "manufacturing" ? manufacturing : activeWorkspaceId === "mining" ? mining : enterprise;
 
-export const { closeGroups, closePeriod, closeTasks, entityCloseStatus, octoberClose, postCloseAdjustment, closeRoles } = active;
+export const { closeGroups, closePeriod, closeTasks, entityCloseStatus, octoberClose, postCloseAdjustment, closeRoles, closeDescription } = active;
 export type { CloseGroup, CloseTaskStatus, CloseTask, EntityCloseStatus } from "./worlds/enterprise/close-data";

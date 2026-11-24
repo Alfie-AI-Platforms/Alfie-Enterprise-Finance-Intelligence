@@ -13,6 +13,8 @@ import {
   submissionWorkflowSteps,
   type Automation,
 } from "@/lib/workspace-data";
+import { automationAgentChoices, automationSourceChoices } from "@/lib/admin-data";
+import { activeWorkspace } from "@/lib/workspace";
 
 export const Route = createFileRoute("/automations")({ component: AutomationsPage });
 
@@ -30,23 +32,8 @@ const lifecycle = [
   "Paused or Disabled",
   "Archived",
 ];
-const agentChoices = [
-  "Reconciliation Agent",
-  "Close Agent",
-  "AP Processing Agent",
-  "AR Collections Agent",
-  "FP&A Analysis Agent",
-  "Treasury Agent",
-  "Compliance Monitoring Agent",
-];
-const sourceChoices = [
-  "NetSuite",
-  "TD Bank Feed",
-  "Chase Bank Feed",
-  "Salesforce",
-  "Concur Expenses",
-  "SharePoint Document Library",
-];
+const agentChoices = automationAgentChoices;
+const sourceChoices = automationSourceChoices;
 
 function AutomationsPage() {
   const [items, setItems] = useState<Automation[]>(seedAutomations);
@@ -63,7 +50,7 @@ function AutomationsPage() {
   const [bTrigger, setBTrigger] = useState<Automation["trigger"]>("Event");
   const [bApproval, setBApproval] = useState("Approval required for consequential actions");
   const [bAgents, setBAgents] = useState<string[]>(["AP Processing Agent"]);
-  const [bSources, setBSources] = useState<string[]>(["NetSuite"]);
+  const [bSources, setBSources] = useState<string[]>([automationSourceChoices[0]!]);
   const [testResult, setTestResult] = useState<string | null>(null);
   const [savedNote, setSavedNote] = useState<string | null>(null);
 
@@ -320,7 +307,7 @@ function AutomationsPage() {
             </ol>
             <p className="mt-3 rounded-xl bg-warning/10 p-3 text-xs leading-5">
               A recommendation or a completed analysis is never treated as approval. This execution
-              stays paused until Elena Brooks approves, rejects, or requests changes, and the decision
+              stays paused until {activeWorkspace.userName} approves, rejects, or requests changes, and the decision
               is recorded either way.
             </p>
           </section>

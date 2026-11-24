@@ -1,16 +1,29 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ArrowLeftRight, Bell, BookOpen, Bot, Building2, ChevronDown, ChevronLeft, ChevronRight, CircleDollarSign, ClipboardCheck, CreditCard, FileBarChart, FolderOpen, House, Landmark, Menu, MessageSquareText, Moon, Network, Receipt, Rocket, Scale, Settings, ShieldCheck, Sparkles, Sun, TrendingUp, User, Users, WandSparkles, X, Zap, LifeBuoy, LogOut, SlidersHorizontal, type LucideIcon } from "lucide-react";
+import { ArrowLeftRight, Bell, BookOpen, Bot, Boxes, Building2, Calculator, ChevronDown, ChevronLeft, ChevronRight, CircleDollarSign, ClipboardCheck, Coins, CreditCard, FileBarChart, FolderOpen, HardHat, House, Landmark, Menu, MessageSquareText, Moon, Network, Receipt, Rocket, Scale, Settings, ShieldCheck, Sparkles, Sun, TrendingUp, User, Users, WandSparkles, X, Zap, LifeBuoy, LogOut, SlidersHorizontal, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { notifications, type NotificationItem, type NotificationKind } from "@/lib/notifications-data";
 import { searchEntries, type SearchEntry } from "@/lib/search-data";
 import { WORKSPACES, activeWorkspace, setActiveWorkspace } from "@/lib/workspace";
 
-type NavItem = readonly [string, "/" | "/agents" | "/accounting" | "/close" | "/reconciliations" | "/payables" | "/receivables" | "/planning" | "/treasury" | "/chats" | "/documents" | "/data-sources" | "/automations" | "/users" | "/permissions" | "/billing" | "/settings" | "/reports" | "/migration" | "/onboarding", LucideIcon];
+type NavItem = readonly [string, "/" | "/agents" | "/accounting" | "/close" | "/reconciliations" | "/costing" | "/inventory" | "/projects" | "/royalties" | "/payables" | "/receivables" | "/planning" | "/treasury" | "/chats" | "/documents" | "/data-sources" | "/automations" | "/users" | "/permissions" | "/billing" | "/settings" | "/reports" | "/migration" | "/onboarding", LucideIcon];
 type NavGroup = { title: string; items: readonly NavItem[] };
+const workItems: readonly NavItem[] = [
+  ["Accounting", "/accounting", BookOpen],
+  ["Close", "/close", ClipboardCheck],
+  ["Reconciliations", "/reconciliations", Scale],
+  ...(activeWorkspace.id === "manufacturing"
+    ? ([["Costing", "/costing", Calculator], ["Inventory", "/inventory", Boxes]] as readonly NavItem[])
+    : []),
+  ...(activeWorkspace.id === "mining"
+    ? ([["Capital Projects", "/projects", HardHat], ["Royalties", "/royalties", Coins]] as readonly NavItem[])
+    : []),
+  ["Payables", "/payables", Receipt],
+  ["Receivables", "/receivables", CircleDollarSign],
+];
 const groups: readonly NavGroup[] = [
   { title: "", items: [["Home", "/", House]] },
-  { title: "Work", items: [["Accounting", "/accounting", BookOpen], ["Close", "/close", ClipboardCheck], ["Reconciliations", "/reconciliations", Scale], ["Payables", "/payables", Receipt], ["Receivables", "/receivables", CircleDollarSign]] },
+  { title: "Work", items: workItems },
   { title: "Intelligence", items: [["Planning & FP&A", "/planning", TrendingUp], ["Treasury", "/treasury", Landmark], ["Reports", "/reports", FileBarChart]] },
   { title: "Library", items: [["Chats", "/chats", MessageSquareText], ["Documents", "/documents", FolderOpen], ["Data Sources", "/data-sources", Network], ["Migration", "/migration", ArrowLeftRight], ["Automations", "/automations", Zap], ["Agents", "/agents", Bot]] },
   { title: "Administration", items: [["Onboarding", "/onboarding", Rocket], ["Users & Access", "/users", Users], ["Policies & Permissions", "/permissions", ShieldCheck], ["Billing", "/billing", CreditCard], ["Settings", "/settings", Settings]] },
@@ -58,7 +71,7 @@ export function AppShell({ children, rightPanel }: { children: ReactNode; rightP
   const markRead = (id: string) => {
     if (!readIds.includes(id)) persistReadIds([...readIds, id]);
   };
-  const activeLabel = path.startsWith("/agents") ? "Agents" : path.startsWith("/accounting") ? "Accounting" : path.startsWith("/close") ? "Close" : path.startsWith("/reconciliations") ? "Reconciliations" : path.startsWith("/payables") ? "Payables" : path.startsWith("/receivables") ? "Receivables" : path.startsWith("/planning") ? "Planning & FP&A" : path.startsWith("/treasury") ? "Treasury" : path.startsWith("/chats") ? "Chats" : path.startsWith("/documents") ? "Documents" : path.startsWith("/data-sources") ? "Data Sources" : path.startsWith("/automations") ? "Automations" : path.startsWith("/users") ? "Users & Access" : path.startsWith("/permissions") ? "Policies & Permissions" : path.startsWith("/migration") ? "Migration" : path.startsWith("/onboarding") ? "Onboarding" : path.startsWith("/profile") ? "Profile" : path.startsWith("/preferences") ? "Preferences" : path.startsWith("/help") ? "Help" : path.startsWith("/billing") ? "Billing" : path.startsWith("/settings") ? "Settings" : path.startsWith("/reports") ? "Reports" : "Home";
+  const activeLabel = path.startsWith("/agents") ? "Agents" : path.startsWith("/accounting") ? "Accounting" : path.startsWith("/close") ? "Close" : path.startsWith("/reconciliations") ? "Reconciliations" : path.startsWith("/costing") ? "Costing" : path.startsWith("/inventory") ? "Inventory" : path.startsWith("/projects") ? "Capital Projects" : path.startsWith("/royalties") ? "Royalties" : path.startsWith("/payables") ? "Payables" : path.startsWith("/receivables") ? "Receivables" : path.startsWith("/planning") ? "Planning & FP&A" : path.startsWith("/treasury") ? "Treasury" : path.startsWith("/chats") ? "Chats" : path.startsWith("/documents") ? "Documents" : path.startsWith("/data-sources") ? "Data Sources" : path.startsWith("/automations") ? "Automations" : path.startsWith("/users") ? "Users & Access" : path.startsWith("/permissions") ? "Policies & Permissions" : path.startsWith("/migration") ? "Migration" : path.startsWith("/onboarding") ? "Onboarding" : path.startsWith("/profile") ? "Profile" : path.startsWith("/preferences") ? "Preferences" : path.startsWith("/help") ? "Help" : path.startsWith("/billing") ? "Billing" : path.startsWith("/settings") ? "Settings" : path.startsWith("/reports") ? "Reports" : "Home";
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("alfie-theme");

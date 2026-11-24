@@ -24,7 +24,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { conversationFolders, seedConversations, type Conversation } from "@/lib/workspace-data";
+import {
+  chatBillReply,
+  chatBoardPackReply,
+  chatCashReply,
+  chatJournalReply,
+  chatPlanningReply,
+  chatReceivableReply,
+  chatSeedCloseReply,
+  conversationFolders,
+  seedConversations,
+  type Conversation,
+} from "@/lib/workspace-data";
 
 export const Route = createFileRoute("/chats")({ component: ChatsPage });
 
@@ -54,12 +65,9 @@ const seedMessages: Msg[] = [
     role: "alfie",
     reply: {
       agents: ["Close Agent"],
-      retrieved:
-        "Close checklist status from the Close workspace, synced 9 minutes ago. 18 of 64 tasks are complete and subledger cutoffs start Nov 28.",
-      analysis:
-        "Three items need attention this week: JE-2026-1087 is waiting on CFO approval, the payroll clearing exception of $3,215 is unreconciled, and Concur expenses have not synced for 3 days, so November expense accruals are estimated.",
-      recommendation:
-        "Start with JE-2026-1087. It is the only item blocked on an executive decision, and it holds the intercompany sign-off for the group.",
+      retrieved: chatSeedCloseReply.retrieved,
+      analysis: chatSeedCloseReply.analysis,
+      recommendation: chatSeedCloseReply.recommendation,
       sources: ["Close workspace", "Documents: Accounting Policies Manual, section 6.1"],
     },
   },
@@ -94,11 +102,10 @@ function routeReply(text: string, hasFiles: boolean): Reply {
       ],
       retrieved:
         "This spans modules, so I coordinated four agents. Each retrieved only the information its permissions allow: accounting, close, planning and treasury figures.",
-      analysis:
-        "Revenue is tracking 3.2% ahead of budget year to date while gross margin is 0.8 points behind plan, and cash is $18.4M. The full breakdown is in the draft, separated into what was retrieved, what I analyzed, and what I recommend.",
+      analysis: chatBoardPackReply.analysis,
       recommendation:
-        "Review the draft before it goes to the board. Figures from QuickBooks are excluded because Meridian Retail is mid-migration, and the draft says so.",
-      sources: ["NetSuite", "TD and Chase bank feeds", "Planning workspace"],
+        "Review the draft before it goes to the board. Figures from the legacy system are excluded because one entity is mid-migration, and the draft says so.",
+      sources: chatBoardPackReply.sources,
       action: {
         label: "Prepare the November board pack",
         detail:
@@ -109,46 +116,40 @@ function routeReply(text: string, hasFiles: boolean): Reply {
   if (t.includes("journal") || t.includes("entry") || t.includes("entries"))
     return {
       agents: ["Close Agent"],
-      retrieved:
-        "Journal entries and account balances from NetSuite, synced 12 minutes ago, limited to the entries your role can access.",
+      retrieved: chatJournalReply.retrieved,
       analysis:
         "I compared open entries against the approval rules in the Accounting Policies Manual. The items needing attention are the ones blocked on approvals, not the largest amounts.",
-      sources: ["NetSuite", "Documents: Accounting Policies Manual"],
+      sources: chatJournalReply.sources,
     };
   if (t.includes("bill") || t.includes("payable") || t.includes("vendor"))
     return {
       agents: ["AP Processing Agent"],
-      retrieved:
-        "Vendor bills, purchase orders and receiving records from NetSuite, with expense detail from Concur where it is current.",
+      retrieved: chatBillReply.retrieved,
       analysis:
         "The bill sits within the approval policy for its amount. Where the three-way match shows a variance, I have flagged it rather than treating the bill as approved.",
-      sources: ["NetSuite", "Documents: Accounting Policies Manual, section 6.2"],
+      sources: chatBillReply.sources,
     };
   if (t.includes("receivable") || t.includes("customer") || t.includes("collection") || t.includes("aging"))
     return {
       agents: ["AR Collections Agent"],
-      retrieved:
-        "Customer balances and aging from NetSuite and Salesforce, which are current.",
+      retrieved: chatReceivableReply.retrieved,
       analysis:
         "I matched open invoices against payment history and credit limits. Anything that changes a customer record, such as a credit hold, is proposed below, not applied.",
-      sources: ["NetSuite", "Salesforce"],
+      sources: chatReceivableReply.sources,
     };
   if (t.includes("margin") || t.includes("forecast") || t.includes("budget") || t.includes("planning"))
     return {
       agents: ["FP&A Analysis Agent"],
       retrieved: "Budget, actuals and forecast data from the Planning workspace, refreshed 41 minutes ago.",
-      analysis:
-        "The movement is concentrated in Manufacturing input costs, not volume. I have separated the data I retrieved from the interpretation, and the underlying figures are available in Planning & FP&A.",
-      sources: ["Planning workspace", "NetSuite"],
+      analysis: chatPlanningReply.analysis,
+      sources: chatPlanningReply.sources,
     };
   if (t.includes("revenue") || t.includes("cash") || t.includes("finance") || t.includes("financial"))
     return {
       agents: ["Reconciliation Agent"],
-      retrieved:
-        "Financial figures from NetSuite, synced 12 minutes ago. These are the same figures shown in Reports.",
-      analysis:
-        "Cash is $18.4M across 6 accounts and the leverage covenant sits at 2.1x against a 3.0x maximum, while receivables over 60 days need attention. Sample figures in this workspace are illustrative until your systems are connected.",
-      sources: ["NetSuite", "Treasury workspace"],
+      retrieved: chatCashReply.retrieved,
+      analysis: chatCashReply.analysis,
+      sources: chatCashReply.sources,
     };
   if (
     t.includes("procedure") ||

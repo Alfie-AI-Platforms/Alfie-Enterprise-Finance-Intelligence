@@ -5,6 +5,7 @@ import { AppShell } from "@/components/app-shell";
 import { AlfieChip, PageHeader } from "@/components/alfie-ui";
 import { Button } from "@/components/ui/button";
 import {
+  closeDescription,
   closeGroups,
   closePeriod,
   closeRoles,
@@ -95,10 +96,7 @@ function ClosePage() {
   return (
     <AppShell>
       <div className="mx-auto max-w-7xl px-5 pb-12 pt-8 lg:px-10">
-        <PageHeader
-          title="Close"
-          description="Month end close for Meridian Group, managed as a controlled process with owners, due dates, approvals and reconciliation status across all three entities."
-        />
+        <PageHeader title="Close" description={closeDescription} />
         <div className="mt-4">
           <SampleDataNote />
         </div>

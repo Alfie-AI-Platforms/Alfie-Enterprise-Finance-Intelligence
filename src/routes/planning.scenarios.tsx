@@ -6,11 +6,17 @@ import { Button } from "@/components/ui/button";
 import { PlanningHeader, SampleDataNote, card } from "@/components/planning-nav";
 import {
   basePlanScenario,
+  boardRecord,
   planConstants,
+  planDownsideOverrides,
+  planUpsideOverrides,
+  planningApprovalImpact,
   runPlanScenario,
+  scenarioCopy,
   seedPlanScenarios,
   type PlanScenarioInputs,
 } from "@/lib/planning-data";
+import { activeWorkspace } from "@/lib/workspace";
 
 export const Route = createFileRoute("/planning/scenarios")({
   head: () => ({ meta: [{ title: "Scenario Modeling | Alfie Enterprise Finance" }] }),
@@ -33,8 +39,7 @@ const money = (n: number) => `$${n.toFixed(1)}M`;
 function ScenariosPage() {
   const [inputs, setInputs] = useState<PlanScenarioInputs>({
     ...basePlanScenario,
-    steelPct: 8,
-    fxRate: 1.42,
+    ...planDownsideOverrides,
   });
   const [name, setName] = useState("");
   const [saved, setSaved] = useState<SavedScenario[]>(
@@ -61,10 +66,10 @@ function ScenariosPage() {
     setSaved((prev) => [
       {
         id,
-        name: name.trim() || `Scenario ${id.slice(4)}, steel ${inputs.steelPct >= 0 ? "+" : ""}${inputs.steelPct}%, USD/CAD ${inputs.fxRate.toFixed(2)}`,
+        name: name.trim() || `Scenario ${id.slice(4)}, ${scenarioCopy.costInputName} ${inputs.steelPct >= 0 ? "+" : ""}${inputs.steelPct}%, USD/CAD ${inputs.fxRate.toFixed(2)}`,
         inputs: { ...inputs },
         status: "Draft",
-        owner: "Elena Brooks",
+        owner: activeWorkspace.userName,
         created: "Nov 16, 2026",
         note: "Saved from the scenario builder. Assumptions are versioned with the scenario.",
       },
@@ -72,7 +77,7 @@ function ScenariosPage() {
     ]);
     setName("");
     setNote(
-      `Saved as ${id} (Draft). Scenarios are separate from the live budget and forecast: nothing here changes FR-2026-008 or FR-2026-011. To act on a scenario, attach it to a Forecast Review so the approval workflow applies.`,
+      `Saved as ${id} (Draft). Scenarios are separate from the live budget and forecast: nothing here changes ${boardRecord.review} or ${planningApprovalImpact.reviewId}. To act on a scenario, attach it to a Forecast Review so the approval workflow applies.`,
     );
   }
   function duplicate(s: SavedScenario) {
@@ -122,7 +127,7 @@ function ScenariosPage() {
         <div className="mt-4">
           <SampleDataNote>
             Illustrative sample data. Results are simple arithmetic on the stated assumptions, not
-            a financial forecast. The assumptions are printed with every result: steel is{" "}
+            a financial forecast. The assumptions are printed with every result: {scenarioCopy.costInputName} is{" "}
             {planConstants.steelSharePct}% of revenue, USD denominated revenue is{" "}
             {planConstants.usdSharePct}% of the group, and operating expenses are held at{" "}
             {planConstants.opexRatio}% of revenue.
@@ -144,7 +149,7 @@ function ScenariosPage() {
                 10,
                 0.5,
                 `${inputs.growthPct >= 0 ? "+" : ""}${inputs.growthPct}%`,
-                "Growth on top of the FY2027 budget revenue of $128.0M, before volume and currency effects.",
+                `Growth on top of the FY2027 budget revenue of $${basePlanScenario.revenue.toFixed(1)}M, before volume and currency effects.`,
               )}
               {slider(
                 "Volume change",
@@ -153,16 +158,16 @@ function ScenariosPage() {
                 10,
                 0.5,
                 `${inputs.volumePct >= 0 ? "+" : ""}${inputs.volumePct}%`,
-                "Shipped and billed volume across the group. Scenario C tests +4% from the prospective Logistics contracts.",
+                scenarioCopy.volumeHint,
               )}
               {slider(
-                "Steel price change",
+                scenarioCopy.costInputLabel,
                 "steelPct",
                 -5,
                 25,
                 0.5,
                 `${inputs.steelPct >= 0 ? "+" : ""}${inputs.steelPct}%`,
-                "Steel is 18% of revenue in Manufacturing costs, so each 1% on steel is about 0.18 points of gross margin.",
+                scenarioCopy.costHint,
               )}
               {slider(
                 "USD/CAD rate",
@@ -171,7 +176,7 @@ function ScenariosPage() {
                 1.48,
                 0.01,
                 inputs.fxRate.toFixed(2),
-                "Translation rate for the 27.2% of revenue that is USD denominated. The budget rate is 1.36; the downside uses 1.42.",
+                `Translation rate for the ${planConstants.usdSharePct}% of revenue that is USD denominated. The budget rate is ${planConstants.baseFxRate.toFixed(2)}; the downside uses ${planDownsideOverrides.fxRate?.toFixed(2)}.`,
               )}
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -185,14 +190,14 @@ function ScenariosPage() {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => setInputs((p) => ({ ...p, steelPct: 8, fxRate: 1.42 }))}
+                onClick={() => setInputs((p) => ({ ...p, ...planDownsideOverrides }))}
               >
-                Downside, steel and FX
+                {scenarioCopy.downsideLabel}
               </Button>
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => setInputs((p) => ({ ...p, steelPct: 0, fxRate: 1.36, volumePct: 4 }))}
+                onClick={() => setInputs((p) => ({ ...p, ...planUpsideOverrides }))}
               >
                 Volume upside
               </Button>
@@ -249,19 +254,19 @@ function ScenariosPage() {
                 </tbody>
               </table>
               <p className="mt-2 text-[13px] leading-4 text-muted-foreground">
-                Key driver: at steel {inputs.steelPct >= 0 ? "+" : ""}
+                Key driver: at {scenarioCopy.costInputName} {inputs.steelPct >= 0 ? "+" : ""}
                 {inputs.steelPct}% and USD/CAD {inputs.fxRate.toFixed(2)}, revenue{" "}
-                {result.revenue >= baseline.revenue ? "rises" : "falls"} on translation and volume
-                while gross margin{" "}
-                {result.grossMargin <= baseline.grossMargin ? "compresses" : "expands"} on input
-                costs. The two effects move in opposite directions, which is why this scenario is
+                {result.revenue >= baseline.revenue ? "rises" : "falls"} {scenarioCopy.driverRevenuePhrase}
+                {" "}while gross margin{" "}
+                {result.grossMargin <= baseline.grossMargin ? "compresses" : "expands"} {scenarioCopy.driverMarginPhrase}.
+                The two effects move in opposite directions, which is why this scenario is
                 attached to the forecast review rather than summarized as a single number.
               </p>
             </section>
 
             <section className={`${card} p-5`}>
               <h2 className="text-sm font-semibold">
-                Sensitivity: steel price at the current growth and FX settings
+                Sensitivity: {scenarioCopy.costInputName} price at the current growth and FX settings
               </h2>
               <div className="mt-2.5 grid grid-cols-3 gap-2 sm:grid-cols-5">
                 {sensitivity.map(({ steel, r }) => (
@@ -270,7 +275,7 @@ function ScenariosPage() {
                     className={`rounded-xl p-3 text-center ${steel === inputs.steelPct ? "bg-primary/10 ring-1 ring-primary" : "bg-secondary/50"}`}
                   >
                     <p className="text-[12px] font-medium uppercase tracking-wide text-muted-foreground">
-                      Steel {steel >= 0 ? "+" : ""}
+                      {scenarioCopy.costInputTitle} {steel >= 0 ? "+" : ""}
                       {steel}%
                     </p>
                     <p className="mt-1 text-sm font-semibold">{pct(r.grossMargin)}</p>
@@ -281,9 +286,7 @@ function ScenariosPage() {
                 ))}
               </div>
               <p className="mt-2 text-[13px] leading-4 text-muted-foreground">
-                One variable at a time, everything else held at the builder values. Each 5 points
-                on steel is about 0.9 points of gross margin, which is the sensitivity finding
-                Alfie carries into the forecast review and the budget book appendix.
+                {scenarioCopy.sensitivityNote}
               </p>
             </section>
 
@@ -292,11 +295,7 @@ function ScenariosPage() {
                 <Bot className="size-4 text-primary" /> Alfie, scenario notes
               </h2>
               <p className="mt-1.5 text-xs leading-5 text-muted-foreground">
-                Scenario B (steel +8%, USD/CAD 1.42) is the downside attached to forecast review
-                FR-2026-011 and the downside case in Treasury. Alfie recommends keeping Scenario C
-                (volume upside) out of the approval pack until the Logistics contracts are signed:
-                it models the revenue without the hiring and capex needed to serve it. Neither
-                scenario changes anything in the budget or forecast on its own.
+                {scenarioCopy.alfieNote}
               </p>
             </section>
           </div>
@@ -331,7 +330,7 @@ function ScenariosPage() {
                       <td className="py-2.5 pr-3">
                         Growth {s.inputs.growthPct >= 0 ? "+" : ""}
                         {s.inputs.growthPct}%, volume {s.inputs.volumePct >= 0 ? "+" : ""}
-                        {s.inputs.volumePct}%, steel {s.inputs.steelPct >= 0 ? "+" : ""}
+                        {s.inputs.volumePct}%, {scenarioCopy.costInputName} {s.inputs.steelPct >= 0 ? "+" : ""}
                         {s.inputs.steelPct}%, USD/CAD {s.inputs.fxRate.toFixed(2)}
                       </td>
                       <td className="py-2.5 pr-3">{money(r.revenue)}</td>
@@ -355,10 +354,7 @@ function ScenariosPage() {
             </table>
           </div>
           <p className="mt-2 text-[13px] leading-4 text-muted-foreground">
-            All scenarios share the FY2027 budget baseline and the stated assumptions. Under those
-            assumptions the strongest EBITDA comes from the volume upside, and the weakest from the
-            steel downside, even though downside revenue is higher. That trade-off is the decision,
-            and it belongs to the Forecast Review, not to this page.
+            {scenarioCopy.comparisonNote}
           </p>
         </section>
       </div>
