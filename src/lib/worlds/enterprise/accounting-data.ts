@@ -1,0 +1,585 @@
+export type EntryStatus = "Needs Review" | "In Preparation" | "Awaiting Approval" | "Approved" | "Posted";
+export type Priority = "High" | "Medium" | "Low";
+
+export type EntryLine = {
+  account: string;
+  accountName: string;
+  entity: string;
+  debit: number;
+  credit: number;
+  memo: string;
+};
+
+export type DocSection = { heading: string; body: string };
+
+export type EntryEvidence = {
+  id: string;
+  name: string;
+  label: string;
+  size: string;
+  summary: string;
+  sections: DocSection[];
+};
+
+export type EntryAnalysis = {
+  intro: string;
+  items: string[];
+  next: string;
+  confidence: string;
+  sources: string[];
+};
+
+export type JournalEntry = {
+  id: string;
+  title: string;
+  type: string;
+  entity: string;
+  status: EntryStatus;
+  priority: Priority;
+  preparedBy: string;
+  reviewer: string;
+  updated: string;
+  updatedDays: number;
+  period: string;
+  entryDate: string;
+  amount: number;
+  source: string;
+  lines: EntryLine[];
+  evidence: EntryEvidence[];
+  analysis: EntryAnalysis;
+};
+
+export const entryStatuses: readonly EntryStatus[] = ["Needs Review", "In Preparation", "Awaiting Approval", "Approved", "Posted"];
+
+export const entities: readonly string[] = ["Meridian Manufacturing Inc.", "Meridian Logistics LLC", "Meridian Retail Group Inc.", "Meridian Group (consolidated)"];
+
+export const entries: JournalEntry[] = [
+  {
+    id: "JE-2026-1087",
+    title: "Intercompany FX revaluation, October 31",
+    type: "Intercompany",
+    entity: "Meridian Logistics LLC",
+    status: "Needs Review",
+    priority: "High",
+    preparedBy: "Alfie",
+    reviewer: "Marcus Webb",
+    updated: "26m ago",
+    updatedDays: 0,
+    period: "October 2026 · Post-close adjustment",
+    entryDate: "October 31, 2026",
+    amount: 18400,
+    source: "Alfie intercompany reconciliation",
+    lines: [
+      { account: "7150", accountName: "Foreign exchange loss", entity: "Meridian Logistics LLC", debit: 18400, credit: 0, memo: "Revalue the USD intercompany payable to the October 31 closing rate" },
+      { account: "2120", accountName: "Intercompany payable, Meridian Manufacturing Inc.", entity: "Meridian Logistics LLC", debit: 0, credit: 18400, memo: "USD 298,553 at 1.3820, the October 31 closing rate" },
+    ],
+    evidence: [
+      {
+        id: "ev1",
+        name: "intercompany_balance_report_oct31.pdf",
+        label: "Intercompany Balance Report",
+        size: "188 KB",
+        summary: "NetSuite consolidation report at October 31, 2026. Manufacturing carries an intercompany receivable of $412,600; Logistics carries the matching payable at $394,200 after conversion. Difference: $18,400.",
+        sections: [
+          { heading: "Receivable, Meridian Manufacturing", body: "The receivable from Meridian Logistics LLC is carried at $412,600. Manufacturing revalued its USD-denominated balance at the October 31 closing rate as part of the October close." },
+          { heading: "Payable, Meridian Logistics", body: "The payable to Meridian Manufacturing Inc. is carried at $394,200 after conversion. The balance was translated at the September closing rate; no October revaluation entry was posted in the Logistics ledger." },
+          { heading: "Difference", body: "The two sides of the same balance differ by $18,400. Consolidation cannot eliminate the intercompany pair until both sides agree, which is why this adjustment is required after the close." },
+        ],
+      },
+      {
+        id: "ev2",
+        name: "fx_rates_october_2026.pdf",
+        label: "FX Rates, October 2026",
+        size: "96 KB",
+        summary: "Reference rates used by the group for October 2026, sourced from the Bank of Canada daily rate. USD/CAD closing rate at October 31: 1.3820. September 30 closing rate: 1.3203.",
+        sections: [
+          { heading: "Closing rates", body: "USD/CAD closed at 1.3820 on October 31, 2026, against 1.3203 at September 30. The movement reflects the Canadian dollar weakening through October." },
+          { heading: "Application", body: "Group policy revalues monetary balances denominated in a foreign currency at each month-end closing rate. Applied to the Logistics intercompany balance of USD 298,553, the October 31 rate gives $412,600, which is $18,400 above the carried amount." },
+        ],
+      },
+      {
+        id: "ev3",
+        name: "intercompany_agreement_extract.pdf",
+        label: "Intercompany Agreement Extract",
+        size: "240 KB",
+        summary: "Extract of the intercompany financing agreement between Meridian Manufacturing Inc. and Meridian Logistics LLC. The balance is denominated in USD and is repayable on demand.",
+        sections: [
+          { heading: "Balance and currency", body: "Meridian Logistics LLC draws on a USD-denominated intercompany facility provided by Meridian Manufacturing Inc. The outstanding balance at October 31, 2026 is USD 298,553." },
+          { heading: "Accounting treatment", body: "Each entity revalues the balance at the month-end closing rate in its reporting currency. Differences identified on consolidation are corrected in the entity that has not revalued." },
+        ],
+      },
+      {
+        id: "ev4",
+        name: "alfie_intercompany_workpaper.pdf",
+        label: "Alfie Reconciliation Workpaper",
+        size: "132 KB",
+        summary: "Alfie's post-close intercompany check. The workpaper traces the $18,400 difference to the missing October 31 revaluation in the Logistics ledger and supports entry JE-2026-1087.",
+        sections: [
+          { heading: "Trace", body: "Alfie compared the intercompany pair across both ledgers and the consolidation report. Manufacturing posted its October revaluation on October 31; the matching Logistics revaluation is absent from the October journal register." },
+          { heading: "Conclusion", body: "The difference is a translation difference only. No cash, invoice or balance amount is in dispute. Entry JE-2026-1087 records the revaluation in Logistics so the pair eliminates cleanly in consolidation." },
+        ],
+      },
+    ],
+    analysis: {
+      intro: "I reconciled the intercompany balances between Meridian Manufacturing and Meridian Logistics for the October close and found one difference that needs correcting:",
+      items: [
+        "Manufacturing carries an intercompany receivable of $412,600, while Logistics carries the matching payable at $394,200 after conversion, a difference of $18,400.",
+        "The USD balance of $298,553 was still translated at the September closing rate. Manufacturing revalued its side at October 31; Logistics did not post a revaluation in October.",
+        "At the October 31 closing rate of 1.3820, the payable translates to $412,600. This entry records the $18,400 revaluation in Logistics so both sides agree and the pair eliminates on consolidation.",
+      ],
+      next: "Controller review, then CFO approval. Post-close adjustments above $10,000 require both.",
+      confidence: "High",
+      sources: ["Intercompany Balance Report, Oct 31", "FX Rates, October 2026", "Intercompany Agreement Extract", "NetSuite GL, Meridian Logistics"],
+    },
+  },
+  {
+    id: "JE-2026-1098",
+    title: "Payroll accrual, November",
+    type: "Payroll",
+    entity: "Meridian Group (consolidated)",
+    status: "Needs Review",
+    priority: "Medium",
+    preparedBy: "Alfie",
+    reviewer: "Marcus Webb",
+    updated: "5h ago",
+    updatedDays: 0,
+    period: "November 2026",
+    entryDate: "November 30, 2026",
+    amount: 486200,
+    source: "Alfie payroll accrual",
+    lines: [
+      { account: "6110", accountName: "Salaries and wages", entity: "Meridian Group (consolidated)", debit: 412800, credit: 0, memo: "Accrued salaries for the November 23 to 30 pay period" },
+      { account: "6150", accountName: "Payroll taxes and benefits", entity: "Meridian Group (consolidated)", debit: 73400, credit: 0, memo: "Employer taxes and benefits on accrued salaries" },
+      { account: "2130", accountName: "Accrued payroll", entity: "Meridian Group (consolidated)", debit: 0, credit: 486200, memo: "Payable on the December 4 payroll run" },
+    ],
+    evidence: [
+      {
+        id: "ev1",
+        name: "payroll_register_november_2026.pdf",
+        label: "Payroll Register, November 2026",
+        size: "214 KB",
+        summary: "Payroll register summary for November 2026 across the three entities. The final pay period of the month runs November 23 to 30 and is paid on December 4.",
+        sections: [
+          { heading: "Accrual basis", body: "Accrued salaries of $412,800 cover November 23 to 30, calculated from the current payroll register for all active employees in the three entities." },
+          { heading: "Employer costs", body: "Employer taxes and benefits of $73,400 are accrued at the blended rate from the last completed payroll run." },
+        ],
+      },
+      {
+        id: "ev2",
+        name: "payroll_calendar_2026.pdf",
+        label: "Payroll Calendar",
+        size: "88 KB",
+        summary: "Group payroll calendar for 2026. Pay periods are weekly, paid the following Friday. The November 23 to 30 period is paid on December 4, 2026.",
+        sections: [
+          { heading: "Cut-off", body: "Because the pay date falls in December, the November portion is accrued at November 30 and reverses automatically when the December 4 payroll is processed." },
+        ],
+      },
+    ],
+    analysis: {
+      intro: "This accrual covers the final week of November, which falls in the November period but is paid on December 4:",
+      items: [
+        "Accrued salaries of $412,800 cover November 23 to 30 across the three entities, based on the current payroll register.",
+        "Employer taxes and benefits of $73,400 are accrued at the blended rate from the last completed payroll.",
+        "The accrual reverses automatically when the December 4 payroll is processed, so there is no manual reversal to track.",
+      ],
+      next: "Controller review and posting.",
+      confidence: "High",
+      sources: ["Payroll Register, November 2026", "Payroll Calendar"],
+    },
+  },
+  {
+    id: "JE-2026-1095",
+    title: "Revenue cut-off adjustment, October",
+    type: "Revenue",
+    entity: "Meridian Retail Group Inc.",
+    status: "Awaiting Approval",
+    priority: "High",
+    preparedBy: "Daniel Okafor",
+    reviewer: "James Whitfield",
+    updated: "3h ago",
+    updatedDays: 0,
+    period: "October 2026 · Post-close adjustment",
+    entryDate: "October 31, 2026",
+    amount: 58900,
+    source: "Alfie cut-off check",
+    lines: [
+      { account: "4010", accountName: "Product revenue", entity: "Meridian Retail Group Inc.", debit: 58900, credit: 0, memo: "Reverse October revenue for goods delivered November 2" },
+      { account: "2060", accountName: "Deferred revenue", entity: "Meridian Retail Group Inc.", debit: 0, credit: 58900, memo: "Invoices RG-8841 to RG-8846, delivery completed November 2" },
+    ],
+    evidence: [
+      {
+        id: "ev1",
+        name: "retail_invoice_listing_october.pdf",
+        label: "Retail Invoice Listing, October",
+        size: "156 KB",
+        summary: "Meridian Retail invoices dated October 31, 2026. Six invoices, RG-8841 to RG-8846, total $58,900 and were recorded as October revenue.",
+        sections: [
+          { heading: "Invoices in question", body: "Invoices RG-8841 to RG-8846 were issued on October 31 for goods picked up by the carrier the same day. The invoice dates fall in October; the delivery dates do not." },
+        ],
+      },
+      {
+        id: "ev2",
+        name: "carrier_delivery_log.pdf",
+        label: "Carrier Delivery Log",
+        size: "121 KB",
+        summary: "Carrier delivery records for the six invoices. All six deliveries were completed and signed for on November 2, 2026.",
+        sections: [
+          { heading: "Delivery evidence", body: "Signed delivery receipts for RG-8841 to RG-8846 are all dated November 2. Under the group revenue policy, revenue is recognized on delivery, so the $58,900 belongs in November." },
+        ],
+      },
+    ],
+    analysis: {
+      intro: "Alfie's cut-off check found six Retail invoices recorded in October where delivery was completed in November:",
+      items: [
+        "Invoices RG-8841 to RG-8846 total $58,900 and were dated October 31. The carrier delivery records show delivery on November 2.",
+        "Under the group revenue policy, revenue is recognized on delivery. This entry defers the $58,900 to November.",
+        "The related cost of sales effect is immaterial and will be picked up in the November close.",
+      ],
+      next: "CFO approval, as a post-close adjustment above the $10,000 threshold, then posting.",
+      confidence: "High",
+      sources: ["Retail Invoice Listing, October", "Carrier Delivery Log"],
+    },
+  },
+  {
+    id: "JE-2026-1093",
+    title: "Depreciation run, November",
+    type: "Depreciation",
+    entity: "Meridian Group (consolidated)",
+    status: "In Preparation",
+    priority: "Medium",
+    preparedBy: "Daniel Okafor",
+    reviewer: "Marcus Webb",
+    updated: "2h ago",
+    updatedDays: 0,
+    period: "November 2026",
+    entryDate: "November 30, 2026",
+    amount: 212480,
+    source: "NetSuite fixed assets",
+    lines: [
+      { account: "6810", accountName: "Depreciation expense", entity: "Meridian Manufacturing Inc.", debit: 148920, credit: 0, memo: "Plant and equipment, Toronto" },
+      { account: "6810", accountName: "Depreciation expense", entity: "Meridian Logistics LLC", debit: 41360, credit: 0, memo: "Warehouse equipment and fleet, Columbus" },
+      { account: "6810", accountName: "Depreciation expense", entity: "Meridian Retail Group Inc.", debit: 22200, credit: 0, memo: "Store fixtures and equipment, Vancouver" },
+      { account: "1590", accountName: "Accumulated depreciation", entity: "Meridian Group (consolidated)", debit: 0, credit: 212480, memo: "November depreciation run per the fixed asset register" },
+    ],
+    evidence: [
+      {
+        id: "ev1",
+        name: "fixed_asset_register_extract.pdf",
+        label: "Fixed Asset Register Extract",
+        size: "342 KB",
+        summary: "Extract of the group fixed asset register supporting the November depreciation run of $212,480 across the three entities.",
+        sections: [
+          { heading: "Run composition", body: "Manufacturing accounts for $148,920 of the run, reflecting the plant and equipment base in Toronto. Logistics accounts for $41,360 and Retail for $22,200." },
+          { heading: "Changes this month", body: "The Columbus racking installation reaches the end of its useful life this month and drops out of the December run. No disposals or impairments are included in this run." },
+        ],
+      },
+    ],
+    analysis: {
+      intro: "The November depreciation run from the fixed asset register is drafted and ready to finish:",
+      items: [
+        "The run totals $212,480 across the three entities. Manufacturing is the largest share at $148,920, reflecting the plant and equipment base in Toronto.",
+        "One asset, the Columbus racking installation, reaches the end of its useful life this month and drops out of the December run.",
+        "No disposals or impairments are included in this run.",
+      ],
+      next: "Finish preparation, then Controller review.",
+      confidence: "High",
+      sources: ["Fixed Asset Register Extract"],
+    },
+  },
+  {
+    id: "JE-2026-1091",
+    title: "Prepaid insurance allocation, November",
+    type: "Prepaid",
+    entity: "Meridian Manufacturing Inc.",
+    status: "Needs Review",
+    priority: "Low",
+    preparedBy: "Daniel Okafor",
+    reviewer: "Marcus Webb",
+    updated: "1h ago",
+    updatedDays: 0,
+    period: "November 2026",
+    entryDate: "November 30, 2026",
+    amount: 36000,
+    source: "NetSuite prepaid schedule",
+    lines: [
+      { account: "6320", accountName: "Insurance expense", entity: "Meridian Manufacturing Inc.", debit: 36000, credit: 0, memo: "November allocation of the annual property and liability premium" },
+      { account: "1450", accountName: "Prepaid expenses", entity: "Meridian Manufacturing Inc.", debit: 0, credit: 36000, memo: "Prepaid insurance, policy year to August 2027" },
+    ],
+    evidence: [
+      {
+        id: "ev1",
+        name: "prepaid_schedule_november_2026.pdf",
+        label: "Prepaid Schedule, November 2026",
+        size: "104 KB",
+        summary: "Prepaid expense schedule for the group insurance premium. The annual premium of $432,000 was prepaid in September 2026 and is allocated evenly over the policy year.",
+        sections: [
+          { heading: "Allocation", body: "The monthly allocation is $36,000. After the November entry, the prepaid balance is $324,000, covering December 2026 to August 2027." },
+          { heading: "Agreement to the ledger", body: "The schedule agrees to the prepaid balance in NetSuite with no variance." },
+        ],
+      },
+    ],
+    analysis: {
+      intro: "This is the November allocation of the group annual insurance premium, posted from the prepaid schedule:",
+      items: [
+        "The annual premium of $432,000 was prepaid in September and is allocated evenly over the policy year, $36,000 per month.",
+        "The schedule balance after this entry is $324,000, covering December 2026 to August 2027.",
+        "The allocation agrees to the prepaid schedule in NetSuite with no variance.",
+      ],
+      next: "Controller review and posting.",
+      confidence: "High",
+      sources: ["Prepaid Schedule, November 2026"],
+    },
+  },
+  {
+    id: "JE-2026-1084",
+    title: "Allowance for doubtful accounts top-up",
+    type: "Accrual",
+    entity: "Meridian Retail Group Inc.",
+    status: "Approved",
+    priority: "Medium",
+    preparedBy: "Daniel Okafor",
+    reviewer: "Elena Brooks",
+    updated: "Yesterday",
+    updatedDays: 1,
+    period: "October 2026 · Post-close adjustment",
+    entryDate: "October 31, 2026",
+    amount: 15600,
+    source: "Alfie receivables review",
+    lines: [
+      { account: "6620", accountName: "Bad debt expense", entity: "Meridian Retail Group Inc.", debit: 15600, credit: 0, memo: "Top-up of the allowance for doubtful accounts, October review" },
+      { account: "1290", accountName: "Allowance for doubtful accounts", entity: "Meridian Retail Group Inc.", debit: 0, credit: 15600, memo: "Allowance held against overdue Retail receivables" },
+    ],
+    evidence: [
+      {
+        id: "ev1",
+        name: "retail_aging_october.pdf",
+        label: "Retail Receivables Aging, October",
+        size: "118 KB",
+        summary: "Aging of Meridian Retail receivables at October 31, 2026, supporting the $15,600 top-up of the allowance for doubtful accounts.",
+        sections: [
+          { heading: "Basis", body: "The top-up follows the October aging review and brings the allowance in line with the group's provisioning matrix for balances over 60 days." },
+        ],
+      },
+    ],
+    analysis: {
+      intro: "This top-up brings the Retail allowance for doubtful accounts in line with the October aging review:",
+      items: [
+        "The allowance is calculated on the group's provisioning matrix for balances over 60 days.",
+        "The entry was reviewed and approved by the VP Finance as a post-close adjustment.",
+      ],
+      next: "Approved. Posts with the next consolidation run.",
+      confidence: "High",
+      sources: ["Retail Receivables Aging, October"],
+    },
+  },
+  {
+    id: "JE-2026-1079",
+    title: "Amex corporate card expense allocation",
+    type: "Reclassification",
+    entity: "Meridian Group (consolidated)",
+    status: "Posted",
+    priority: "Low",
+    preparedBy: "Daniel Okafor",
+    reviewer: "Marcus Webb",
+    updated: "9d ago",
+    updatedDays: 9,
+    period: "October 2026",
+    entryDate: "October 31, 2026",
+    amount: 41860,
+    source: "NetSuite",
+    lines: [
+      { account: "6410", accountName: "Travel and entertainment", entity: "Meridian Group (consolidated)", debit: 41860, credit: 0, memo: "October corporate card spend allocated by cost centre" },
+      { account: "2150", accountName: "Corporate card clearing", entity: "Meridian Group (consolidated)", debit: 0, credit: 41860, memo: "Amex corporate card clearing, October statement" },
+    ],
+    evidence: [
+      {
+        id: "ev1",
+        name: "amex_statement_october.pdf",
+        label: "Amex Statement, October",
+        size: "167 KB",
+        summary: "American Express corporate card statement for October 2026. Total spend of $41,860 was allocated to cost centres and posted in the October close.",
+        sections: [
+          { heading: "Allocation", body: "Each transaction on the October statement was coded to a cost centre in Concur before posting. The clearing account balance for October is nil after this entry." },
+        ],
+      },
+    ],
+    analysis: {
+      intro: "Posted to NetSuite on October 31, 2026 as part of the October close:",
+      items: ["October corporate card spend of $41,860 was allocated by cost centre from the Amex statement.", "The corporate card clearing account is nil for October after this entry."],
+      next: "Posted. No further action.",
+      confidence: "High",
+      sources: ["Amex Statement, October"],
+    },
+  },
+  {
+    id: "JE-2026-1071",
+    title: "Income tax installment accrual, Q4",
+    type: "Accrual",
+    entity: "Meridian Group (consolidated)",
+    status: "Posted",
+    priority: "Low",
+    preparedBy: "Daniel Okafor",
+    reviewer: "Marcus Webb",
+    updated: "9d ago",
+    updatedDays: 9,
+    period: "October 2026",
+    entryDate: "October 31, 2026",
+    amount: 310000,
+    source: "NetSuite",
+    lines: [
+      { account: "7210", accountName: "Income tax expense", entity: "Meridian Group (consolidated)", debit: 310000, credit: 0, memo: "Q4 income tax installment accrual" },
+      { account: "2210", accountName: "Income taxes payable", entity: "Meridian Group (consolidated)", debit: 0, credit: 310000, memo: "Installment payable on the Q4 due date" },
+    ],
+    evidence: [
+      {
+        id: "ev1",
+        name: "tax_installment_schedule.pdf",
+        label: "Tax Installment Schedule",
+        size: "92 KB",
+        summary: "Income tax installment schedule for 2026. The Q4 installment accrual of $310,000 follows the schedule agreed with the group's tax advisors.",
+        sections: [
+          { heading: "Basis", body: "Installments are accrued monthly against the annual schedule so the expense is recognized in the period it relates to." },
+        ],
+      },
+    ],
+    analysis: {
+      intro: "Posted to NetSuite on October 31, 2026 as part of the October close:",
+      items: ["The Q4 installment accrual of $310,000 follows the installment schedule for 2026."],
+      next: "Posted. No further action.",
+      confidence: "High",
+      sources: ["Tax Installment Schedule"],
+    },
+  },
+  {
+    id: "JE-2026-1063",
+    title: "October revenue recognition",
+    type: "Revenue",
+    entity: "Meridian Group (consolidated)",
+    status: "Posted",
+    priority: "Low",
+    preparedBy: "NetSuite",
+    reviewer: "Marcus Webb",
+    updated: "10d ago",
+    updatedDays: 10,
+    period: "October 2026",
+    entryDate: "October 31, 2026",
+    amount: 9800000,
+    source: "NetSuite billing",
+    lines: [
+      { account: "1210", accountName: "Accounts receivable", entity: "Meridian Group (consolidated)", debit: 9800000, credit: 0, memo: "October invoicing per NetSuite billing" },
+      { account: "4010", accountName: "Product revenue", entity: "Meridian Group (consolidated)", debit: 0, credit: 9800000, memo: "October revenue recognized on delivery" },
+    ],
+    evidence: [
+      {
+        id: "ev1",
+        name: "october_revenue_summary.pdf",
+        label: "October Revenue Summary",
+        size: "148 KB",
+        summary: "Consolidated revenue summary for October 2026. Revenue of $9.8M was recognized across the three entities and posted as the October summary entry.",
+        sections: [
+          { heading: "Composition", body: "The $9.8M October total is the consolidated sum of delivered invoicing for Manufacturing, Logistics and Retail, recognized on delivery under the group revenue policy." },
+        ],
+      },
+    ],
+    analysis: {
+      intro: "Posted to NetSuite on October 31, 2026 as part of the October close:",
+      items: ["October revenue of $9.8M was recognized on delivery across the three entities.", "This is the summary posting from NetSuite billing; invoice-level detail sits in Receivables."],
+      next: "Posted. No further action.",
+      confidence: "High",
+      sources: ["October Revenue Summary"],
+    },
+  },
+  {
+    id: "JE-2026-1055",
+    title: "Inventory obsolescence provision",
+    type: "Accrual",
+    entity: "Meridian Manufacturing Inc.",
+    status: "Posted",
+    priority: "Low",
+    preparedBy: "Daniel Okafor",
+    reviewer: "Marcus Webb",
+    updated: "10d ago",
+    updatedDays: 10,
+    period: "October 2026",
+    entryDate: "October 31, 2026",
+    amount: 27300,
+    source: "NetSuite",
+    lines: [
+      { account: "6580", accountName: "Inventory write-down", entity: "Meridian Manufacturing Inc.", debit: 27300, credit: 0, memo: "Provision against slow-moving Toronto inventory, October review" },
+      { account: "1480", accountName: "Inventory obsolescence provision", entity: "Meridian Manufacturing Inc.", debit: 0, credit: 27300, memo: "Provision balance after the October review" },
+    ],
+    evidence: [
+      {
+        id: "ev1",
+        name: "slow_moving_inventory_report.pdf",
+        label: "Slow-Moving Inventory Report",
+        size: "176 KB",
+        summary: "Toronto warehouse slow-moving inventory report at October 31, 2026, supporting the $27,300 obsolescence provision.",
+        sections: [
+          { heading: "Basis", body: "The provision covers stock lines with no movement in over 180 days, valued under the group's provisioning policy." },
+        ],
+      },
+    ],
+    analysis: {
+      intro: "Posted to NetSuite on October 31, 2026 as part of the October close:",
+      items: ["The $27,300 provision covers Toronto stock lines with no movement in over 180 days."],
+      next: "Posted. No further action.",
+      confidence: "High",
+      sources: ["Slow-Moving Inventory Report"],
+    },
+  },
+  {
+    id: "JE-2026-1042",
+    title: "Intercompany management fee, October",
+    type: "Intercompany",
+    entity: "Meridian Manufacturing Inc.",
+    status: "Posted",
+    priority: "Low",
+    preparedBy: "Daniel Okafor",
+    reviewer: "Marcus Webb",
+    updated: "11d ago",
+    updatedDays: 11,
+    period: "October 2026",
+    entryDate: "October 31, 2026",
+    amount: 148500,
+    source: "NetSuite",
+    lines: [
+      { account: "2140", accountName: "Intercompany receivable, Meridian Logistics LLC", entity: "Meridian Manufacturing Inc.", debit: 148500, credit: 0, memo: "October management fee charged to Logistics" },
+      { account: "4250", accountName: "Management fee income", entity: "Meridian Manufacturing Inc.", debit: 0, credit: 148500, memo: "Monthly management fee per the intercompany services agreement" },
+    ],
+    evidence: [
+      {
+        id: "ev1",
+        name: "intercompany_services_agreement_extract.pdf",
+        label: "Intercompany Services Agreement Extract",
+        size: "203 KB",
+        summary: "Extract of the intercompany services agreement. Manufacturing provides management, finance and IT services to Logistics for a monthly fee of $148,500.",
+        sections: [
+          { heading: "Fee basis", body: "The monthly fee of $148,500 is fixed under the agreement and is eliminated on consolidation with the matching expense in Logistics." },
+        ],
+      },
+    ],
+    analysis: {
+      intro: "Posted to NetSuite on October 31, 2026 as part of the October close:",
+      items: ["The October management fee of $148,500 was charged to Logistics under the intercompany services agreement.", "The fee eliminates on consolidation against the matching expense in Logistics."],
+      next: "Posted. No further action.",
+      confidence: "High",
+      sources: ["Intercompany Services Agreement Extract"],
+    },
+  },
+];
+
+export const getEntry = (id: string) => entries.find((entry) => entry.id === id);
+export const money = (value: number) => `${value < 0 ? "-" : ""}$${Math.abs(value).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+
+export type AuditEvent = { time: string; actor: string; actorType: "User" | "Alfie" | "System"; action: string; source: string; result: string };
+
+export const seedAudit: AuditEvent[] = [
+  { time: "Nov 14, 09:16", actor: "Alfie", actorType: "Alfie", action: "Entry routed for review", source: "Accounting workflow", result: "With Marcus Webb (Controller)" },
+  { time: "Nov 14, 09:15", actor: "Alfie", actorType: "Alfie", action: "Prepared JE-2026-1087", source: "Intercompany workpaper", result: "$18,400 FX revaluation drafted" },
+  { time: "Nov 14, 09:14", actor: "Alfie", actorType: "Alfie", action: "Traced difference to FX revaluation", source: "FX Rates, October 2026", result: "Missing October 31 revaluation identified" },
+  { time: "Nov 14, 09:12", actor: "Alfie", actorType: "Alfie", action: "Reconciled intercompany balances", source: "NetSuite consolidation", result: "Difference of $18,400 flagged" },
+  { time: "Nov 1, 08:03", actor: "System", actorType: "System", action: "Logistics books closed for October", source: "NetSuite", result: "No FX revaluation posted for October" },
+  { time: "Oct 31, 18:22", actor: "Daniel Okafor", actorType: "User", action: "Posted Manufacturing revaluation", source: "NetSuite GL", result: "Receivable revalued to $412,600" },
+  { time: "Sep 30, 17:45", actor: "System", actorType: "System", action: "September revaluation posted", source: "NetSuite GL", result: "Payable carried at the September closing rate" },
+];

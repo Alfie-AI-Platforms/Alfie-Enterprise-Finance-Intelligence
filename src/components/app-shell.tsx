@@ -4,6 +4,7 @@ import { ArrowLeftRight, Bell, BookOpen, Bot, Building2, ChevronDown, ChevronLef
 import { Button } from "@/components/ui/button";
 import { notifications, type NotificationItem, type NotificationKind } from "@/lib/notifications-data";
 import { searchEntries, type SearchEntry } from "@/lib/search-data";
+import { WORKSPACES, activeWorkspace, setActiveWorkspace } from "@/lib/workspace";
 
 type NavItem = readonly [string, "/" | "/agents" | "/accounting" | "/close" | "/reconciliations" | "/payables" | "/receivables" | "/planning" | "/treasury" | "/chats" | "/documents" | "/data-sources" | "/automations" | "/users" | "/permissions" | "/billing" | "/settings" | "/reports" | "/migration" | "/onboarding", LucideIcon];
 type NavGroup = { title: string; items: readonly NavItem[] };
@@ -30,6 +31,7 @@ export function AppShell({ children, rightPanel }: { children: ReactNode; rightP
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [workspaceOpen, setWorkspaceOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [readIds, setReadIds] = useState<string[]>([]);
@@ -79,9 +81,24 @@ export function AppShell({ children, rightPanel }: { children: ReactNode; rightP
     {mobileOpen ? <div className="fixed inset-0 z-30 bg-overlay lg:hidden" onClick={() => setMobileOpen(false)} /> : null}
     <aside className={`fixed inset-y-0 left-0 z-40 flex flex-col border-r border-border bg-sidebar transition-[width,transform] duration-200 ease-out lg:relative lg:translate-x-0 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "w-[72px]" : "w-[248px]"}`}>
       <div className={`flex h-16 shrink-0 items-center ${collapsed ? "justify-center" : "justify-between px-3"}`}>
-        <div className={`flex min-w-0 items-center ${collapsed ? "hidden" : "gap-2.5"}`}>
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-ink text-ink-foreground"><Building2 className="size-4" /></div>
-          <div className="min-w-0"><p className="truncate text-sm font-semibold">Meridian Group</p><p className="text-[12px] text-muted-foreground">Finance workspace</p></div>
+        <div className={`relative min-w-0 ${collapsed ? "hidden" : ""}`}>
+          <button type="button" onClick={() => setWorkspaceOpen((value) => !value)} className="flex min-w-0 items-center gap-2.5 rounded-md px-1 py-1 text-left hover:bg-secondary/60" aria-label="Switch workspace" aria-expanded={workspaceOpen}>
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-ink text-ink-foreground"><Building2 className="size-4" /></span>
+            <span className="min-w-0"><span className="block truncate text-sm font-semibold">{activeWorkspace.companyShort}</span><span className="block text-[12px] text-muted-foreground">{activeWorkspace.label}</span></span>
+            <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
+          </button>
+          {workspaceOpen ? <>
+            <button type="button" aria-hidden="true" tabIndex={-1} className="fixed inset-0 z-40 cursor-default" onClick={() => setWorkspaceOpen(false)} />
+            <div className="absolute left-0 top-full z-50 mt-1 w-64 rounded-md border border-border bg-popover p-1 shadow-workspace">
+              <p className="px-3 pb-1 pt-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Switch workspace</p>
+              {WORKSPACES.map((workspace) => <button key={workspace.id} type="button" onClick={() => { setWorkspaceOpen(false); if (workspace.id !== activeWorkspace.id) setActiveWorkspace(workspace.id); }} className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-left hover:bg-secondary/60 ${workspace.id === activeWorkspace.id ? "bg-secondary" : ""}`}>
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-ink text-ink-foreground"><Building2 className="size-4" /></span>
+                <span className="min-w-0 flex-1"><span className="block truncate text-xs font-semibold">{workspace.companyShort}</span><span className="block text-[12px] text-muted-foreground">{workspace.industry}</span></span>
+                {workspace.id === activeWorkspace.id ? <span className="size-2 shrink-0 rounded-full bg-notification" /> : null}
+              </button>)}
+              <p className="px-3 pb-2 pt-1.5 text-[12px] leading-4 text-muted-foreground">Demo switcher. A client workspace is set at onboarding.</p>
+            </div>
+          </> : null}
         </div>
         <Button variant="ghost" size="icon" onClick={() => setCollapsed((value) => !value)} className="hidden lg:inline-flex" aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}>{collapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}</Button>
         <Button variant="ghost" size="icon" onClick={() => setMobileOpen(false)} className="lg:hidden" aria-label="Close navigation"><X className="size-4" /></Button>
@@ -98,8 +115,8 @@ export function AppShell({ children, rightPanel }: { children: ReactNode; rightP
         </div>
         {profileOpen ? <div className={`absolute bottom-[66px] z-50 w-52 rounded-md border border-border bg-popover p-1 shadow-workspace ${collapsed ? "left-14" : "left-3"}`}>{profileItems.map(([label, Icon, to]) => to ? <Button key={label} asChild variant="ghost" className="w-full justify-start px-3 text-xs"><Link to={to} onClick={() => setProfileOpen(false)}><Icon className="size-4" />{label}</Link></Button> : <Button key={label} variant="ghost" className="w-full justify-start px-3 text-xs" onClick={() => setProfileOpen(false)}><Icon className="size-4" />{label}</Button>)}</div> : null}
         <Button variant="ghost" onClick={() => setProfileOpen((value) => !value)} className={`h-auto w-full ${collapsed ? "px-0" : "justify-start px-2 py-2"}`} aria-label="Open user menu">
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-avatar text-xs font-semibold text-avatar-foreground">EB</div>
-          {!collapsed ? <><span className="min-w-0 flex-1 text-left"><span className="block text-xs font-semibold text-foreground">Elena Brooks</span><span className="block text-[12px] font-normal text-muted-foreground">VP Finance</span></span><ChevronDown className="size-3.5" /></> : null}
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-avatar text-xs font-semibold text-avatar-foreground">{activeWorkspace.userInitials}</div>
+          {!collapsed ? <><span className="min-w-0 flex-1 text-left"><span className="block text-xs font-semibold text-foreground">{activeWorkspace.userName}</span><span className="block text-[12px] font-normal text-muted-foreground">{activeWorkspace.userRole}</span></span><ChevronDown className="size-3.5" /></> : null}
         </Button>
       </div>
     </aside>
